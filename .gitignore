@@ -5,7 +5,7 @@
 *.DS_Store
 .~lock*
 Rplots.pdf
-data/
+data/recordings/
 
 ########
 # R
