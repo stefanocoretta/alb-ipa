@@ -1,0 +1,3 @@
+[submodule "data/alb-ipa_emuDB"]
+	path = data/alb-ipa_emuDB
+	url = git@gitlab.lrz.de:stefanocoretta/alb-ipa_emuDB.git
