@@ -6,6 +6,7 @@
 .~lock*
 Rplots.pdf
 data/recordings/raw/excluded/
+data/recordings/derived/post-align/
 
 ########
 # R
