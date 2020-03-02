@@ -1,0 +1,112 @@
+######################################
+# This is a script from the project 'An IPA illustration of Albanian'.
+#
+# The script creates post-alignment chunks (.wav files) to be used in EMU. The
+# chunks are saved in data/recordings/derived/post-align/<ID>/ where <ID> is the
+# speaker ID in the form of "s01".
+######################################
+# MIT License
+#
+# Copyright (c) 2020 Stefano Coretta
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+######################################
+
+align_dir$ = "../data/recordings/derived/align"
+postalign_dir$ = "../data/recordings/derived/post-align"
+Create Strings as directory list: "dir_list", "'align_dir$'/*"
+speakers = Get number of strings
+
+for speaker from 1 to speakers
+  selectObject: "Strings dir_list"
+  speaker$ = Get string: speaker
+  Read from file: "'align_dir$'/'speaker$'/words.wav"
+  words = selected("Sound")
+  Read from file: "'align_dir$'/'speaker$'/words.TextGrid"
+  tg = selected("TextGrid")
+  # Tier 1 in tg has spelling
+  words_int = Get number of intervals: 1
+  word_idx = 1
+
+  for word from 1 to words_int
+    selectObject: tg
+    word$ = Get label of interval: 1, word
+
+    if word$ <> ""
+      w_start = Get start time of interval: 1, word
+      w_end = Get end time of interval: 1, word
+
+      # We need to beginning of interval `word-1` and the end of interval
+      # `word+1` to extract a little extra of the sound around the word, since
+      # the alingment is not correct.
+      prev_start = Get start time of interval: 1, word - 1
+      fol_end = Get end time of interval: 1, word + 1
+      prev_half_dur = (w_start - prev_start) / 2
+      fol_half_dur = (fol_end - w_end) / 2
+
+      # We don't need more than 300 ms around the word.
+      if prev_half_dur > 300
+        prev_half_dur = 300
+      endif
+
+      if fol_half_dur > 300
+        fol_half_dur = 300
+      endif
+
+      prev_half = prev_start + prev_half_dur
+      fol_half = w_end + fol_half_dur
+
+      selectObject: words
+      words_part = Extract part: prev_half, fol_half, "rectangular", 1, "no"
+      createDirectory: "'postalign_dir$'/'speaker$'/"
+      @zeroFill: word_idx, 3
+      Save as WAV file: "'postalign_dir$'/'speaker$'/word-'zeroFill.return$'.wav"
+
+      selectObject: tg
+      tg_part = Extract part: prev_half, fol_half, "no"
+      Save as text file: "'postalign_dir$'/'speaker$'/word-'zeroFill.return$'.TextGrid"
+
+      removeObject: words_part, tg_part
+
+      word_idx += 1
+    endif
+
+  endfor
+endfor
+
+# Procedure for zero padding, from http://praatscriptingtutorial.com/procedures
+procedure zeroFill: .num, .numZeros
+
+	.highestVal = 10 ^ .numZeros
+
+	.num$ = string$: .num
+	.numLen = length: .num$
+
+	.numToAdd = .numZeros - .numLen
+
+	.zeroPrefix$ = ""
+	if .numToAdd > 0
+		for .i from 1 to .numToAdd
+			.zeroPrefix$ = .zeroPrefix$ + "0"
+		endfor
+	endif
+
+	.return$ = .zeroPrefix$ + .num$
+
+endproc
