@@ -76,11 +76,13 @@ for speaker from 1 to speakers
       words_part = Extract part: prev_half, fol_half, "rectangular", 1, "no"
       createDirectory: "'postalign_dir$'/'speaker$'/"
       @zeroFill: word_idx, 3
-      Save as WAV file: "'postalign_dir$'/'speaker$'/word-'zeroFill.return$'.wav"
+      word_safe$ = replace$(word$, "ë", "3", 0)
+      word_safe$ = replace$(word_safe$, "ç", "tsh", 0)
+      Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'word_safe$'.wav"
 
       selectObject: tg
       tg_part = Extract part: prev_half, fol_half, "no"
-      Save as text file: "'postalign_dir$'/'speaker$'/word-'zeroFill.return$'.TextGrid"
+      Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'word_safe$'.TextGrid"
 
       removeObject: words_part, tg_part
 
