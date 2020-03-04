@@ -36,6 +36,8 @@ speakers = Get number of strings
 for speaker from 1 to speakers
   selectObject: "Strings dir_list"
   speaker$ = Get string: speaker
+
+  # Words
   Read from file: "'align_dir$'/'speaker$'/words.wav"
   words = selected("Sound")
   Read from file: "'align_dir$'/'speaker$'/words.TextGrid"
@@ -90,6 +92,47 @@ for speaker from 1 to speakers
     endif
 
   endfor
+
+  # Sentences
+  Read from file: "'align_dir$'/'speaker$'/sentences.wav"
+  sentences = selected("Sound")
+  Read from file: "'align_dir$'/'speaker$'/sentences.TextGrid"
+  tg = selected("TextGrid")
+  # Tier 1 in tg has spelling
+  sent_int = Get number of intervals: 1
+
+  for sent from 1 to sent_int
+    selectObject: tg
+    sent$ = Get label of interval: 1, sent
+
+    if sent$ <> ""
+      s_start = Get start time of interval: 1, sent
+      s_end = Get end time of interval: 1, sent
+
+      selectObject: sentences
+      sent_part = Extract part: s_start, s_end, "rectangular", 1, "no"
+      createDirectory: "'postalign_dir$'/'speaker$'/"
+      @zeroFill: word_idx, 3
+      Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-sentence.wav"
+
+      selectObject: tg
+      tg_part = Extract part: s_start, s_start, "no"
+      Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-sentence.TextGrid"
+
+      removeObject: sent_part, tg_part
+
+      word_idx += 1
+    endif
+
+  endfor
+
+  # Story
+  @zeroFill: word_idx, 3
+  Read from file: "'align_dir$'/'speaker$'/sentences.wav"
+  Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.wav"
+  Read from file: "'align_dir$'/'speaker$'/sentences.TextGrid"
+  Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.TextGrid"
+
 endfor
 
 # Procedure for zero padding, from http://praatscriptingtutorial.com/procedures
