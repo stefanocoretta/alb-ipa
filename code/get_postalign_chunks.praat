@@ -79,7 +79,7 @@ for speaker from 1 to speakers
       createDirectory: "'postalign_dir$'/'speaker$'/"
       @zeroFill: word_idx, 3
       word_safe$ = replace$(word$, "ë", "3", 0)
-      word_safe$ = replace$(word_safe$, "ç", "tsh", 0)
+      word_safe$ = replace$(word_safe$, "ç", "5", 0)
       Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'word_safe$'.wav"
 
       selectObject: tg
