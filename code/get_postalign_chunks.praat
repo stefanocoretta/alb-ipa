@@ -62,15 +62,6 @@ for speaker from 1 to speakers
       prev_half_dur = (w_start - prev_start) / 2
       fol_half_dur = (fol_end - w_end) / 2
 
-      # We don't need more than 300 ms around the word.
-      if prev_half_dur > 300
-        prev_half_dur = 300
-      endif
-
-      if fol_half_dur > 300
-        fol_half_dur = 300
-      endif
-
       prev_half = prev_start + prev_half_dur
       fol_half = w_end + fol_half_dur
 
