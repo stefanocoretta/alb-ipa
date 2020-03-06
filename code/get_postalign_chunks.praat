@@ -104,11 +104,11 @@ for speaker from 1 to speakers
       sent_part = Extract part: s_start, s_end, "rectangular", 1, "no"
       createDirectory: "'postalign_dir$'/'speaker$'/"
       @zeroFill: word_idx, 3
-      Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-sentence.wav"
+      Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.wav"
 
       selectObject: tg
       tg_part = Extract part: s_start, s_start, "no"
-      Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-sentence.TextGrid"
+      Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.TextGrid"
 
       removeObject: sent_part, tg_part
 
