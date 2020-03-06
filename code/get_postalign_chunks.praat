@@ -120,9 +120,9 @@ for speaker from 1 to speakers
 
   # Story
   @zeroFill: word_idx, 3
-  Read from file: "'align_dir$'/'speaker$'/sentences.wav"
+  Read from file: "'align_dir$'/'speaker$'/story.wav"
   Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.wav"
-  Read from file: "'align_dir$'/'speaker$'/sentences.TextGrid"
+  Read from file: "'align_dir$'/'speaker$'/story.TextGrid"
   Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.TextGrid"
 
 endfor
