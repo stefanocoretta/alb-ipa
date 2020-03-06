@@ -108,6 +108,7 @@ for speaker from 1 to speakers
 
       selectObject: tg
       tg_part = Extract part: s_start, s_end, "no"
+      Remove tier: 1
       Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.TextGrid"
 
       removeObject: sent_part, tg_part
