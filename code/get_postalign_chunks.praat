@@ -107,7 +107,7 @@ for speaker from 1 to speakers
       Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.wav"
 
       selectObject: tg
-      tg_part = Extract part: s_start, s_start, "no"
+      tg_part = Extract part: s_start, s_end, "no"
       Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.TextGrid"
 
       removeObject: sent_part, tg_part
