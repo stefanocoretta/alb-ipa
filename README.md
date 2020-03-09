@@ -16,6 +16,10 @@ This is the research compendium of the project *Albanian IPA illustration*.
   - `alb-ipa_emuDB/`: (*git submodule*) contains the emuDB.
 - `code/`: contains code for data (pre-)processing.
 
+## Recording and data processing
+
+Recording and data processing is documented in `code/procedure.md`.
+
 ## To do
 
 - Update `get_prealign_chunks.praat` so that files are not overwritten if they already exist.
