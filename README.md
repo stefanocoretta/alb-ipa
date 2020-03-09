@@ -18,5 +18,6 @@ This is the research compendium of the project *Albanian IPA illustration*.
 
 ## To do
 
+- Update `get_prealign_chunks.praat` so that files are not overwritten if they already exist.
 - [ ] License file.
 - [ ] `analysis/` for R analysis scripts.
