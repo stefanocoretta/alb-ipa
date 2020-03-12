@@ -42,7 +42,7 @@ for file from 1 to files
   base_name$ = file$ - ".TextGrid"
   subj_id$ = mid$(base_name$, 9, 1)
 
-  dir_exists = fileReadable("'align_dir$'/s0'subj_id$'")
+  dir_exists = fileReadable("'align_dir$'/s0'subj_id$'/words.wav")
 
   if dir_exists == 0
     subj_dir$ = "'align_dir$'/s0'subj_id$'"
