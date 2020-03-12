@@ -25,8 +25,12 @@ Force-alignment was achieved with the BAS web service `Pipeline without ASR` wit
 
 The output TextGrids with the force-aligned annotation are saved in each speaker's folder in`data/recordings/derived/align/`.
 
-The Praat script `code/get_postalign_chunks.praat` is run to extract individual audio and TextGrid chunks which were later converted into the EMU database (see below).
-The output of this script is saved in `data/recordings/derived/post-align/`.
+The `sentence.TextGrid` files needed to be manually changed by adding an extra tier which includes a sentence-level segmentation (MAUS output currently does not include a sentence-level segmentation tier).
+The extra tier, called `sent`, was added as tier 1.
+The intervals in `sent` contain the following labels according to the type of the sentence: `broad-focus`, `polar-q`, `narrow-focus-q`, `narrow-focus`.
+
+The Praat script `code/get_postalign_chunks.praat` was then run to extract individual audio and TextGrid chunks which were later converted into the EMU database (see below).
+The output of this script gets saved in `data/recordings/derived/post-align/`.
 This folder is ignored by git.
 
 ## EMU database creation
