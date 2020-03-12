@@ -41,39 +41,44 @@ for file from 1 to files
   tg = selected("TextGrid")
   base_name$ = file$ - ".TextGrid"
   subj_id$ = mid$(base_name$, 9, 1)
-  subj_dir$ = "'align_dir$'/s0'subj_id$'"
-  createDirectory(subj_dir$)
-  Read from file: "'raw_dir$'/'base_name$'.wav"
-  wav = selected("Sound")
 
-  selectObject: tg
-  # Tier 2 contains the intervals to be silenced
-  silence_intervals = Get number of intervals: 2
-  for interval from 1 to silence_intervals
+  dir_exists = fileReadable("'align_dir$'/'subj_id$'")
+
+  if dir_exists == 0
+    subj_dir$ = "'align_dir$'/s0'subj_id$'"
+    createDirectory(subj_dir$)
+    Read from file: "'raw_dir$'/'base_name$'.wav"
+    wav = selected("Sound")
+
     selectObject: tg
-    label$ = Get label of interval: 2, interval
-    if label$ == "silence"
-      start = Get start time of interval: 2, interval
-      end = Get end time of interval: 2, interval
-      selectObject: wav
-      Set part to zero: start, end, "at nearest zero crossing"
-    endif
-  endfor
+    # Tier 2 contains the intervals to be silenced
+    silence_intervals = Get number of intervals: 2
+    for interval from 1 to silence_intervals
+      selectObject: tg
+      label$ = Get label of interval: 2, interval
+      if label$ == "silence"
+        start = Get start time of interval: 2, interval
+        end = Get end time of interval: 2, interval
+        selectObject: wav
+        Set part to zero: start, end, "at nearest zero crossing"
+      endif
+    endfor
 
-  selectObject: tg, wav
-  # Tier 1 contains the intervals with the types (words, sentences, story)
-  Extract intervals where: 1, "no", "is equal to", "words"
-  words = Concatenate
-  Save as WAV file: "'subj_dir$'/words.wav"
+    selectObject: tg, wav
+    # Tier 1 contains the intervals with the types (words, sentences, story)
+    Extract intervals where: 1, "no", "is equal to", "words"
+    words = Concatenate
+    Save as WAV file: "'subj_dir$'/words.wav"
 
-  selectObject: tg, wav
-  Extract intervals where: 1, "no", "is equal to", "sentences"
-  sentences = Concatenate
-  Save as WAV file: "'subj_dir$'/sentences.wav"
+    selectObject: tg, wav
+    Extract intervals where: 1, "no", "is equal to", "sentences"
+    sentences = Concatenate
+    Save as WAV file: "'subj_dir$'/sentences.wav"
 
-  selectObject: tg, wav
-  Extract intervals where: 1, "no", "is equal to", "story"
-  story = Concatenate
-  Save as WAV file: "'subj_dir$'/story.wav"
+    selectObject: tg, wav
+    Extract intervals where: 1, "no", "is equal to", "story"
+    story = Concatenate
+    Save as WAV file: "'subj_dir$'/story.wav"
+  endif
 
 endfor
