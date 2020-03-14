@@ -30,6 +30,7 @@
 
 align_dir$ = "../data/recordings/derived/align"
 postalign_dir$ = "../data/recordings/derived/post-align"
+createDirectory: "'postalign_dir$'"
 Create Strings as directory list: "dir_list", "'align_dir$'/*"
 speakers = Get number of strings
 
