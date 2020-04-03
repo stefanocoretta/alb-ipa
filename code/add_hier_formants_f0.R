@@ -1,6 +1,6 @@
 library(emuR)
 library(wrassp)
-library(PraatR)
+library(PraatR) # devtools::install_github("usagi5886/PraatR")
 library(tools)
 
 path = "./data/alb-ipa_emuDB"
@@ -136,7 +136,7 @@ wav_paths = list.files(path, pattern = ".*wav$", recursive = T, full.names = T)
 k = 1
 for (fp in wav_paths) {
   print(k)
-  ado = praatToFormants2AsspDataObj(normalizePath(fp), arguments = list(0.0, 4.5, 5000, 0.025, 50))
+  ado = praatToFormants2AsspDataObj(normalizePath(fp), arguments = list(0.0, 5, 5500, 0.025, 50))
   newPath = paste0(file_path_sans_ext(normalizePath(fp)), '.praatFms')
   print(paste0(fp, ' -> ', newPath))
   k = k + 1
@@ -145,9 +145,10 @@ for (fp in wav_paths) {
 
 
 add_ssffTrackDefinition(db_handle,
-                        name = "praatFms",
+                        name = "FORMANTS",
                         columnName = "fm",
-                        fileExtension = "praatFms")
+                        fileExtension = "praatFms",
+                        verbose = TRUE)
 
 # Add f0 track ----
 
