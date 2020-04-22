@@ -47,4 +47,35 @@ convert_TextGridCollection(
 ```
 
 The contents of the created `data/recordings/alb-ipa_emuDB/alb-ipa_emuDB/` were moved to `data/recordings/alb-ipa_emuDB/` (as of emuR 2.0.4 there is no straightforward way to create a DB in an already existing folder; rather, a new folder is created).
-The EMU databse is a git submodule.
+The EMU database is a git submodule.
+
+## Build hierarchy, get formants/f0 tracks
+
+The script `code/add_hier_formants_f0.R` was run to build the annotation hierarchy, get formants and f0 tracks.
+
+The hierarchy:
+
+- `ORT-MAU`: spelling.
+- `KANN-MAU`: MAUS word transcription.
+- `MAU`: MAUS segment transcription.
+
+Formant tracks were obtained with the `praatFms` function from wrassp.
+This function uses Praat's algorithm.
+The following settings were used:
+
+- Number of formants: 5.
+- Maximum frequency: 5500.
+- Window length: 0.025.
+- Pre-emphasis from: 50.
+
+F0 tracks were obtained with the `ksvF0` function from wrassp.
+
+## Annotation correction
+
+The automatic segmentation by BAS was manually corrected by the researchers, as follows:
+
+- Words: all segments were corrected.
+- Sentences: only word boundaries were corrected.
+- Story: nothing was corrected.
+
+The formant tracks were corrected in the words.
