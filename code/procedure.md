@@ -52,6 +52,7 @@ The EMU database is a git submodule.
 ## Build hierarchy, get formants/f0 tracks
 
 The script `code/add_hier_formants_f0.R` was run to build the annotation hierarchy, get formants and f0 tracks.
+The script also adds two level definitions: `RELS` (EVENT) for the annotation of stop releases, and `VOI` (EVENT) for the annotation of voice onset (see below).
 
 The hierarchy:
 
@@ -79,3 +80,11 @@ The automatic segmentation by BAS was manually corrected by the researchers, as 
 - Story: nothing was corrected.
 
 The formant tracks were corrected in the words.
+
+## Annotate stop releases and voice onset
+
+The time of stop release for /p, b, t, d, k, g/ was manually annotated in the `RELS` level.
+Only word-initial stops from "consonant" words were annotated.
+
+The time of voice onset for /p, b, t, d, k, g/ was manually annotated in the `VOI` level.
+Only word-initial stops from "consonant" words were annotated.

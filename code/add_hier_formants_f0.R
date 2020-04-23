@@ -156,3 +156,8 @@ add_ssffTrackDefinition(db_handle,
                         name = "F0",
                         onTheFlyFunctionName = "ksvF0",
                         verbose = TRUE)
+
+# Add release and voice onset level defitions ----
+
+add_levelDefinition(db, "RELS", "EVENT")
+add_levelDefinition(db, "VOI", "EVENT")
