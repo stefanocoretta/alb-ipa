@@ -1,0 +1,81 @@
+---
+title: "Plot formants and VOT"
+date: "23/06/2020"
+output: 
+  html_document: 
+    highlight: tango
+    number_sections: yes
+    theme: paper
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+```{r read-data}
+formants <- readRDS("./data/dataframes/formants.rds") %>%
+  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
+
+vot <- readRDS("./data/dataframes/vot.rds") %>%
+  mutate(consonant =  factor(consonant, levels = c("g", "d", "b", "k", "t", "p")))
+```
+
+# Formants
+
+```{r}
+# all speakers together
+ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
+  scale_x_reverse(name="F2 (Hz)") +
+  scale_y_reverse(name="F1 (Hz)") +
+  geom_text(aes(label=vowel), show.legend=FALSE) +
+  stat_ellipse(type="t", size=1)
+```
+
+```{r}
+# male speakers only
+ggplot(subset(formants, gender="M"), aes(x=F2, y=F1, col=vowel)) +
+  scale_x_reverse(name="F2 (Hz)") +
+  scale_y_reverse(name="F1 (Hz)") +
+  geom_text(aes(label=vowel), show.legend=FALSE) +
+  stat_ellipse(type="t", size=1)
+```
+
+```{r}
+# female speakers only
+ggplot(subset(formants, gender="F"), aes(x=F2, y=F1, col=vowel)) +
+  scale_x_reverse(name="F2 (Hz)") +
+  scale_y_reverse(name="F1 (Hz)") +
+  geom_text(aes(label=vowel), show.legend=FALSE) +
+  stat_ellipse(type="t", size=1)
+```
+
+```{r}
+# male-female side by side
+ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
+  facet_wrap(~gender) +
+  scale_x_reverse(name="F2 (Hz)") +
+  scale_y_reverse(name="F1 (Hz)") +
+  geom_text(aes(label=vowel), show.legend=FALSE) +
+  stat_ellipse(type="t", size=1)
+```
+
+```{r}
+# individual speakers side by side
+ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
+  facet_wrap(~speaker) +
+  scale_x_reverse(name="F2 (Hz)") +
+  scale_y_reverse(name="F1 (Hz)") +
+  geom_text(aes(label=vowel), show.legend=FALSE)
+```
+
+# VOT
+
+```{r}
+ggplot(vot, aes(x=VOT, y=consonant)) +
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", color="red")
+```
+
