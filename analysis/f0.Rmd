@@ -1,0 +1,107 @@
+---
+title: "Get F0"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+library(emuR)
+library(tidyverse)
+```
+
+# Prep data
+
+## Prepare emuDB
+
+```{r emudb}
+path <- "./data/alb-ipa_emuDB"
+path2 <- "./data/dataframes"
+db_handle <- load_emuDB(path, verbose = TRUE)
+```
+
+## F0
+
+First, we query the emuDB to get the relevant sentences.
+
+```{r vow}
+pros <- query(db_handle, "MAU !~ <p:>", bundlePattern = "[0-9]*-(broad*|polar*|narrow*)")
+pross <- requery_hier(db_handle, pros, "ORT-MAU")
+pros$word <- pross$labels
+pros <- pros[ which(pros$labels != ""), ]
+proso <- get_trackdata(db_handle, seglist = pros, ssffTrackName = "F0")
+proso <- proso[ which(proso$session != "s03"), ]
+```
+
+The we time normalise time per token.
+
+```{r norm}
+proso$token <- paste(proso$session, proso$bundle)
+proso <- proso %>%
+  group_by(token) %>%
+  mutate(
+    sentence_dur = ((max(times_orig) - min(times_orig))),
+    norm_timepoint = ((times_orig - (min(times_orig)))/sentence_dur)
+  )
+```
+
+We can add info for speaker and sentence
+
+```{r speaker-sentence}
+proso$gender <- recode(
+  proso$session,
+  "s01" = "F",
+  "s02" = "M",
+  "s04" = "F",
+  "s05" = "M",
+  "s06" = "M"
+)
+proso <- proso %>%
+  rename(
+    "f0" = "T1",
+    "segment" = "labels",
+    "speaker" = "session"
+  )
+proso$sentence_type <- factor(substring(proso$bundle, 5))
+proso$sentence <- recode(
+  proso$sentence_type,
+  "broad-focus" = "Lena lau murin.",
+  "narrow-focus" = "Lena lau murin, jo lulen.",
+  "polar-q" = "A e lau Lena murin?",
+  "narrow-focus-q" = "Çfarë lau Lena?"
+  )
+```
+
+Now we add info on token repetition.
+
+```{r repet}
+repet <- proso[ which(proso$norm_timepoint == 0), ]
+repet <- repet %>%
+  ungroup() %>%
+  mutate(number = 1) %>%
+  group_by(speaker, sentence_type) %>%
+  mutate(repetition = cumsum(number)) %>%
+  ungroup() %>%
+  select(speaker, sentence, token, repetition)
+
+proso <- proso %>%
+  left_join(y = repet)
+```
+
+We now remove 0s from voiced segments and information that is not needed.
+
+```{r clean}
+proso <- proso[!(proso$f0 == 0 & (proso$segment != "tS" & proso$segment != "f")),]
+
+proso <- proso[ , -which(names(proso) %in% c("sl_rowIdx", "db_uuid", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "sample_start", "sample_end", "times_rel", "start", "end", "times_norm"))]
+
+columns <- c("speaker", "gender", "segment", "word", "sentence", "sentence_type", "repetition", "f0", "norm_timepoint", "times_orig", "sentence_dur", "token")
+proso <- proso[, columns]
+```
+
+And we now save the tibble.
+
+```{r save}
+saveRDS(proso, file = "./data/dataframes/f0.rds")
+```
+
