@@ -13,17 +13,19 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
 theme_set(theme_minimal())
+library(zoo)
 ```
 
 # Read data
 
 ```{r f0}
-f0 <- readRDS("./data/dataframes/f0.rds")
+f0 <- readRDS("./data/dataframes/f0.rds") %>%
+  mutate(repetition = as.factor(repetition))
 ```
 
 # Plot f0
 
-```{r}
+```{r all}
 # all speakers and sentence types together ----
 f0 %>%
   ggplot(aes(norm_timepoint, f0, colour = speaker, shape = sentence)) +
@@ -34,22 +36,53 @@ f0 %>%
   )
 ```
 
-```{r}
+```{r by-sentence, out.width="200%"}
 # per sentence type, speakers together ----
 f0 %>%
-  ggplot(aes(norm_timepoint, f0, colour = speaker, shape = as.factor(repetition))) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  facet_wrap(~ sentence) +
+  ggplot(aes(norm_timepoint, f0, colour = speaker, shape = repetition)) +
+  geom_point(alpha = 0.5) +
+  geom_path() +
+  facet_wrap( ~ sentence) +
   labs(
     x = "f0 (Hz)",
     y = "normalised time"
-  )
+  ) +
+  theme(legend.pos = "bottom")
 ```
 
-```{r}
+```{r by-token, fig.height=7, out.width="200%"}
+# per sentence type, speakers together ----
+f0 %>%
+  ggplot(aes(norm_timepoint, f0, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(speaker + repetition ~ sentence) +
+  labs(
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r by-token-smoothed, fig.height=7, out.width="200%"}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(speaker + repetition ~ sentence) +
+  labs(
+    title = "Smoothed f0 contours",
+    caption = "Rolling mean filter, order = 21",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r by-speaker, out.width="200%"}
 # per speaker, sentences together ----
 f0 %>%
-  ggplot(aes(norm_timepoint, f0, colour = sentence, shape = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = sentence, shape = repetition)) +
   facet_wrap(~speaker, nrow = 3) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
@@ -58,11 +91,11 @@ f0 %>%
   )
 ```
 
-```{r}
+```{r by-sentence-speaker}
 # per sentence and speaker ----
 f0 %>%
   filter(speaker == "s01") %>%
-  ggplot(aes(norm_timepoint, f0, colour = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
   facet_wrap(~ sentence) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
@@ -74,7 +107,7 @@ f0 %>%
 
 f0 %>%
   filter(speaker == "s02") %>%
-  ggplot(aes(norm_timepoint, f0, colour = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
   facet_wrap(~ sentence) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
@@ -86,7 +119,7 @@ f0 %>%
 
 f0 %>%
   filter(speaker == "s04") %>%
-  ggplot(aes(norm_timepoint, f0, colour = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
   facet_wrap(~ sentence) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
@@ -98,7 +131,7 @@ f0 %>%
 
 f0 %>%
   filter(speaker == "s05") %>%
-  ggplot(aes(norm_timepoint, f0, colour = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
   facet_wrap(~ sentence) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
@@ -110,7 +143,7 @@ f0 %>%
 
 f0 %>%
   filter(speaker == "s06") %>%
-  ggplot(aes(norm_timepoint, f0, colour = as.factor(repetition))) +
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
   facet_wrap(~ sentence) +
   geom_point(alpha = 0.5, size = 0.5) +
   labs(
