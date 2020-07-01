@@ -100,6 +100,16 @@ ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
   geom_text(aes(label=vowel), show.legend=FALSE)
 ```
 
+## All vowels
+
+```{r all-vowels}
+formants_all %>%
+  ggplot(aes(F2, F1, colour = vowel, label = vowel)) +
+  geom_text() +
+  scale_y_reverse() + scale_x_reverse()
+```
+
+
 # VOT
 
 ```{r vot-bar}
