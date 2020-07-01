@@ -71,6 +71,56 @@ formants <- formants %>%
 saveRDS(formants, file = file.path(path2, "formants.rds"))
 ```
 
+## Formants from all vowels
+
+First, we query the emuDB to get the vowels in the relevant example words.
+
+```{r vow-all}
+vow_all <- query(
+  db_handle,
+  "[MAU == p -> #MAU == e| i | y | u | @ | o | a]"
+)
+word <- requery_hier(db_handle, vow_all, "ORT-MAU")
+vow_all$word <- word$labels
+```
+
+Now we can get formants from the midpoint of the vowels.
+
+```{r formants-all}
+formants_all <- get_trackdata(
+  db_handle,
+  seglist = vow_all,
+  cut = 0.5,
+  npoints = 1,
+  ssffTrackName = "FORMANTS",
+  resultType = "tibble"
+)
+formants_all <- formants_all[ , -which(names(formants_all) %in% c("T4", "T5"))]
+formants_all <- formants_all[ which(formants_all$session != "s03"), ]
+```
+
+We now clean, rearrange and save the tibble.
+
+```{r save-formants-all}
+formants_all$gender <- recode(formants_all$session, "s01" = "F", "s02" = "M", "s04" = "F", "s05" = "M", "s06" = "M")
+
+formants_all <- formants_all %>%
+  rename(
+    F1 = T1,
+    F2 = T2,
+    F3 = T3,
+    vowel = labels,
+    speaker = session
+  )
+
+formants_all <- formants_all[ , -which(names(formants_all) %in% c("sl_rowIdx", "db_uuid","session", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "times_rel", "times_norm"))]
+
+formants_all <- formants_all %>%
+  select(speaker, gender, vowel, word, bundle, F1, F2, F3, start, end, sample_start, sample_end, times_orig)
+
+saveRDS(formants_all, file = file.path(path2, "formants_all.rds"))
+```
+
 ## VOT
 
 Quesry the database for the releases.
