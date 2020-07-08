@@ -19,6 +19,9 @@ theme_set(theme_bw())
 formants <- readRDS("./data/dataframes/formants.rds") %>%
   mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
 
+formants_all <- readRDS("./data/dataframes/formants_all.rds") %>%
+  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
+
 vot <- readRDS("./data/dataframes/vot.rds") %>%
   mutate(consonant =  factor(consonant, levels = c("g", "d", "b", "k", "t", "p")))
 ```
@@ -102,11 +105,23 @@ ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
 
 ## All vowels
 
-```{r all-vowels}
+```{r all-vowels-z}
 formants_all %>%
-  ggplot(aes(F2, F1, colour = vowel, label = vowel)) +
-  geom_text() +
-  scale_y_reverse() + scale_x_reverse()
+  group_by(speaker) %>%
+  mutate(
+    F1_z = scale(F1),
+    F2_z = scale(F2)
+  ) %>%
+  filter(
+    F1_z < 2.5, F1_z > -2.5,
+    F2_z < 2.5, F2_z > -2.5
+  ) %>%
+  ggplot(aes(F2_z, F1_z, colour = vowel, label = vowel)) +
+  geom_point(alpha = 0.5) +
+  stat_ellipse(type = "t") +
+  scale_y_reverse() +
+  scale_x_reverse() +
+  coord_fixed()
 ```
 
 
