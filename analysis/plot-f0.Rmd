@@ -78,6 +78,28 @@ f0 %>%
   ) +
   theme(legend.pos = "bottom")
 ```
+```{r f0-illustr, fig.height=7, out.width="200%"}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  filter(
+    repetition == 2,
+    speaker == "s01" & sentence_type == "narrow-focus" |
+    speaker == "s01" & sentence_type == "polar-q" |
+    speaker == "s04" & sentence_type == "broad-focus" |
+    speaker == "s04" & sentence_type == "narrow-focus-q"
+  ) %>%
+  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(. ~ sentence) +
+  labs(
+    title = "Smoothed f0 contours",
+    caption = "Rolling mean filter, order = 21",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
 
 ```{r by-speaker, out.width="200%"}
 # per speaker, sentences together ----
