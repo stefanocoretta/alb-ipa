@@ -161,4 +161,3 @@ add_ssffTrackDefinition(db_handle,
 
 add_levelDefinition(db, "RELS", "EVENT")
 add_levelDefinition(db, "VOI", "EVENT")
-add_levelDefinition(db_handle, "SYL", "ITEM")
