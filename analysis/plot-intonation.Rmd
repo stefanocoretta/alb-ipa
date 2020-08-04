@@ -48,7 +48,7 @@ syl_f0 <- get_trackdata(db_handle, seglist = syl, ssffTrackName = "F0", cut = 0.
       "narrow-focus-q" = "Çfarë lau Lena?"
       )
   )
-syl_f0[syl_f0$labels == "tSfa4",]$f0 <- 400
+syl_f0[syl_f0$labels == "çfar(ë)",]$f0 <- 250
 
 syl <- syl %>%
   group_by(session, bundle) %>%
@@ -95,7 +95,8 @@ f0 %>%
       legend.pos = "none",
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
-      panel.grid.minor.y = element_blank()
+      panel.grid.minor.y = element_blank(),
+      axis.text.x = element_blank()
     ) +
     scale_color_brewer(type = "qual")
 
