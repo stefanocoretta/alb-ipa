@@ -41,7 +41,7 @@ proso <- proso %>%
   group_by(token) %>%
   mutate(
     sentence_dur = max(end) - min(start),
-    norm_timepoint = ((times_orig - (min(times_orig)))/sentence_dur)
+    norm_timepoint = ((times_orig - (min(start)))/sentence_dur)
   )
 ```
 
@@ -75,8 +75,9 @@ proso$sentence <- recode(
 Now we add info on token repetition.
 
 ```{r repet}
-repet <- proso[ which(proso$norm_timepoint == 0), ]
-repet <- repet %>%
+repet <- proso %>%
+  select(speaker, sentence, token, sentence_type) %>%
+  unique() %>%
   ungroup() %>%
   mutate(number = 1) %>%
   group_by(speaker, sentence_type) %>%

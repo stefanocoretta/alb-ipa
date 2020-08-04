@@ -23,19 +23,8 @@ db_handle <- load_emuDB("./data/alb-ipa-int_emuDB", verbose = TRUE)
 ```
 
 ```{r f0}
-f0_red <- readRDS("./data/dataframes/f0.rds") %>%
-  select(token, times_orig) %>%
-  separate(token, into = c("session", "bundle"), sep = " ") %>%
-  group_by(session, bundle) %>%
-  filter(times_orig == min(times_orig) | times_orig == max(times_orig)) %>%
-  mutate(
-    minmax = ifelse(times_orig == min(times_orig), "t_start", "t_end")
-  ) %>%
-  pivot_wider(names_from = minmax, values_from = times_orig)
-
 f0 <- readRDS("./data/dataframes/f0.rds")
 ```
-
 
 # Get and plot data
 
@@ -43,11 +32,10 @@ f0 <- readRDS("./data/dataframes/f0.rds")
 syl <- query(db_handle, "SYL =~ .*", calcTimes = T) %>%
   filter(labels != "<p:>")
 syl_f0 <- get_trackdata(db_handle, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
-  rename(time = "times_orig") %>%
-  left_join(y = f0_red) %>%
+  group_by(session, bundle) %>%
   mutate(
-    sentence_duration = t_end - t_start,
-    norm_timepoint = (time - t_start) / sentence_duration
+    sentence_dur = max(end) - min(start),
+    norm_timepoint = ((times_orig - (min(start)))/sentence_dur)
   ) %>%
   rename(f0 = "T1", speaker = "session") %>%
   mutate(
@@ -61,12 +49,21 @@ syl_f0 <- get_trackdata(db_handle, seglist = syl, ssffTrackName = "F0", cut = 0.
       )
   )
 syl_f0[syl_f0$labels == "tSfa4",]$f0 <- 400
+
 syl <- syl %>%
-  left_join(y = f0_red) %>%
+  group_by(session, bundle) %>%
   mutate(
-    sentence_duration = t_end - t_start,
-    start_norm = (start - t_start) / sentence_duration,
-    end_norm = (end - end) / sentence_duration
+    sentence_duration = max(end) - min(start),
+    start_norm = (start - min(start)) / sentence_duration,
+    end_norm = (end - min(start)) / sentence_duration,
+    sentence_type = str_sub(bundle, 5),
+    sentence = recode(
+      sentence_type,
+      "broad-focus" = "Lena lau murin.",
+      "narrow-focus" = "Lena lau murin, jo lulen.",
+      "polar-q" = "A e lau Lena murin?",
+      "narrow-focus-q" = "Çfarë lau Lena?"
+      )
   )
 ```
 
@@ -82,18 +79,25 @@ f0 %>%
     speaker == "s04" & sentence_type == "narrow-focus-q"
   ) %>%
   ggplot(aes(norm_timepoint, f0_smooth)) +
-  geom_path(aes(colour = speaker), linetype = "dashed") +
-  geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 20, size = 4) +
-  facet_wrap(. ~ sentence, ncol = 1) +
-  labs(
-    title = "Smoothed f0 contours",
-    caption = "Rolling mean filter, order = 21",
-    x = "normalised time",
-    y = "f0 (Hz)"
-  ) +
-  ylim(150, 450) +
-  theme(legend.pos = "none") +
-  scale_color_brewer(type = "qual")
+    geom_path(aes(colour = speaker), linetype = "dashed") +
+    geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 55, size = 4) +
+    geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
+    geom_vline(aes(xintercept = 1), alpha = 0.5) +
+    facet_wrap(. ~ sentence, ncol = 1) +
+    labs(
+      title = "Smoothed f0 contours",
+      caption = "Rolling mean filter, order = 21",
+      x = "normalised time",
+      y = "f0 (Hz)"
+    ) +
+    ylim(150, 500) +
+    theme(
+      legend.pos = "none",
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank()
+    ) +
+    scale_color_brewer(type = "qual")
 
 ggsave("./img/int-plot.png", width = 7, height = 5)
 ```
