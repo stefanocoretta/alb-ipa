@@ -25,7 +25,7 @@ db_handle <- load_emuDB(path, verbose = TRUE)
 First, we query the emuDB to get the relevant sentences.
 
 ```{r vow}
-pros <- query(db_handle, "MAU !~ <p:>", bundlePattern = "[0-9]*-(broad*|polar*|narrow*)")
+pros <- query(db_handle, "MAU !~ <p:>", bundlePattern = "[0-9]*-(broad*|polar*|narrow*)", calcTimes = TRUE)
 pross <- requery_hier(db_handle, pros, "ORT-MAU")
 pros$word <- pross$labels
 pros <- pros[ which(pros$labels != ""), ]
@@ -40,7 +40,7 @@ proso$token <- paste(proso$session, proso$bundle)
 proso <- proso %>%
   group_by(token) %>%
   mutate(
-    sentence_dur = ((max(times_orig) - min(times_orig))),
+    sentence_dur = max(end) - min(start),
     norm_timepoint = ((times_orig - (min(times_orig)))/sentence_dur)
   )
 ```
