@@ -17,7 +17,13 @@ theme_set(theme_bw())
 
 ```{r read-data}
 formants <- readRDS("./data/dataframes/formants.rds") %>%
-  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
+  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a"))) %>%
+  group_by(speaker) %>%
+  mutate(
+    F1.z = scale(F1),
+    F2.z = scale(F2)
+  ) %>%
+  ungroup()
 
 formants_all <- readRDS("./data/dataframes/formants_all.rds") %>%
   mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
@@ -40,6 +46,24 @@ ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
   scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
   geom_text(aes(label=vowel), show.legend=FALSE) +
   stat_ellipse(type="norm", size=1)
+```
+
+```{r all-z}
+# all speakers together, z-scored
+centroids <- aggregate(cbind(F2.z,F1.z)~vowel, formants, mean) %>%
+  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+
+formants %>%
+  ggplot(aes(x = F2.z, y = F1.z, group = vowel)) +
+  scale_x_reverse(name = "F2 (z-scores)", position = "top") +
+  scale_y_reverse(name = "F1 (z-scores)", position = "right") +
+  geom_point(aes(colour = vowel), alpha = 0.5) +
+  stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
+  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  theme(legend.position = "none") +
+  scale_color_brewer(type = "qual", palette = 2)
+
+ggsave("./img/vowel-plot.png", width = 7, height = 5)
 ```
 
 ```{r males}
