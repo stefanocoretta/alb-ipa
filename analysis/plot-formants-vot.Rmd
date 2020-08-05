@@ -142,8 +142,13 @@ vot %>%
 
 ```{r vot-jitter}
 vot %>%
-  ggplot(aes(consonant, VOT, colour = speaker)) +
+  ggplot(aes(consonant, VOT, colour = speaker, shape = speaker)) +
   geom_jitter(width = 0.2) +
   geom_hline(aes(yintercept = 0)) +
-  coord_flip()
+  coord_flip() +
+  labs(
+    y = "VOT (ms)"
+  ) +
+  scale_color_brewer(type = "qual", palette = 2)
+ggsave("./img/vot-jitter.png", width = 7, height = 5)
 ```
