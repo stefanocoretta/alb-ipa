@@ -22,6 +22,6 @@ Recording and data processing is documented in `code/procedure.md`.
 
 ## To do
 
-- Update `get_prealign_chunks.praat` so that files are not overwritten if they already exist.
+- [ ] Update `get_prealign_chunks.praat` so that files are not overwritten if they already exist.
 - [ ] License file.
 - [ ] `analysis/` for R analysis scripts.
