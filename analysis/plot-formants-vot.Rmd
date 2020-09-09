@@ -13,6 +13,24 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
 theme_set(theme_bw())
+
+revlog_trans <- function(base = exp(1)){
+    ## Define the desired transformation.
+    trans <- function(x){
+                 -log(x, base)
+                }
+    ## Define the reverse of the desired transformation
+    inv <- function(x){
+                 base^(-x)
+                }
+    ## Creates the transformation
+    trans_new(paste("revlog-", base, sep = ""),
+              trans, ## The transformation function (can be defined using anonymous functions)
+              inv,  ## The reverse of the transformation
+              log_breaks(base = base), ## default way to define the scale breaks
+              domain = c(1e-100, Inf) ## The domain over which the transformation is valued
+             )
+    }
 ```
 
 ```{r read-data}
@@ -86,6 +104,25 @@ formants %>%
   scale_color_brewer(type = "qual", palette = 2)
 
 ggsave("./img/vowel-plot-z-hz.png", width = 7, height = 5)
+```
+
+```{r all-z-hz-log}
+# all speakers together, z-scored
+centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
+  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+
+formants %>%
+  ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
+  scale_x_continuous(name = "F2 (norm Hz log)", position = "top", trans = revlog_trans(base = 2), breaks = seq(0, 3000, by = 250)) +
+  scale_y_continuous(name = "F1 (norm Hz log)", position = "right", trans = revlog_trans(base = 2), breaks = seq(0, 3000, by = 250)) +
+  geom_point(aes(colour = vowel), alpha = 0.5) +
+  stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
+  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  theme(legend.position = "none") +
+  scale_color_brewer(type = "qual", palette = 2) +
+  geom_abline(slope = 1, intercept = 0)
+
+ggsave("./img/vowel-plot-z-hz-log.png", width = 7, height = 5)
 ```
 
 ```{r males}
