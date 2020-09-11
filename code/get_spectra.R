@@ -16,8 +16,8 @@ add_ssffTrackDefinition(
 # Get query list
 fric_segs <- query(
   db,
-  "[MAU == f|v|T|D|s|z|S|Z]",
-  bundlePattern = "[0-9]*-(fati|vata|that3|dhat3|salla|zalli|shava|zhaba)"
+  "[MAU == f|v|T|D|s|z|S|Z|h]",
+  bundlePattern = "[0-9]*-(fati|vata|that3|dhat3|salla|zalli|shava|zhaba|han3)"
 )
 
 # Get dft in wide format

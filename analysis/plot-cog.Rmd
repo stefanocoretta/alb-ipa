@@ -1,6 +1,10 @@
 ---
 title: "Fricatives CoG"
-output: html_document
+output: 
+  html_document: 
+    highlight: tango
+    number_sections: yes
+    theme: paper
 ---
 
 ```{r setup, include=FALSE}
@@ -11,14 +15,36 @@ theme_set(theme_bw())
 ```
 
 ```{r read-data}
+fric_dft_l <- readRDS("./data/dataframes/fric_dtf_l.rds") %>%
+  mutate(
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
+    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
+  )
+
 cog <- readRDS("./data/dataframes/fric_moments.rds") %>%
   mutate(
     ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
-    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ"))
+    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
   )
 ```
 
-## Cog
+# Averaged spectra
+
+```{r average}
+average_dft <- fric_dft_l %>%
+  group_by(ipa, freq)%>%
+  summarise(track_value = mean(track_value))
+```
+
+```{r spectra}
+average_dft %>%
+  filter(freq < 10000) %>%
+  ggplot(aes(x = freq, y = track_value, colour = ipa)) +
+  geom_line() +
+  facet_wrap(~ ipa)
+```
+
+# Cog
 
 ```{r cog-plot}
 cog %>%
