@@ -1,0 +1,34 @@
+---
+title: "Fricatives CoG"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+```{r read-data}
+cog <- readRDS("./data/dataframes/fric_moments.rds") %>%
+  mutate(
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
+    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ"))
+  )
+```
+
+## Cog
+
+```{r cog-plot}
+cog %>%
+  ggplot(aes(ipa, moment_1)) +
+  geom_boxplot() +
+  labs(
+    x = element_blank(),
+    y = "Center of gravity (Hz)"
+  )
+
+ggsave("./img/cog.png", width = 7, height = 5)
+```
+
