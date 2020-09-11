@@ -32,3 +32,9 @@ cog %>%
 ggsave("./img/cog.png", width = 7, height = 5)
 ```
 
+```{r means-sd}
+cog %>%
+  group_by(ipa) %>%
+  summarise(mean = round(mean(moment_1), 0), sd = round(sd(moment_1), 0))
+```
+
