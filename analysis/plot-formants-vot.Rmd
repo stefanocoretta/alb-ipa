@@ -226,7 +226,7 @@ vot %>%
 ```{r vot-jitter}
 vot %>%
   ggplot(aes(consonant, VOT, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.2) +
+  geom_jitter(width = 0.25, size = 3.5, alpha = 0.7) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
   labs(
