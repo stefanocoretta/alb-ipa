@@ -233,5 +233,5 @@ vot %>%
     y = "VOT (ms)"
   ) +
   scale_color_brewer(type = "qual", palette = 2)
-ggsave("./img/vot-jitter.png", width = 7, height = 5)
+ggsave("./img/vot-jitter.png", width = 7, height = 4)
 ```
