@@ -1,0 +1,40 @@
+---
+title: "Ultrasound"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+library(tidyverse)
+theme_set(theme_bw())
+library(rticulate)
+```
+
+```{r data}
+cols <- c(
+  "speaker",
+  "rec_date",
+  "time",
+  "prompt",
+  "label"
+)
+
+laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  group_by(rec_date) %>%
+  mutate(
+    time_norm = (time - min(time)) / (max(time) - min(time))
+  )
+```
+
+```{r plot}
+laterals %>%
+  ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
+  geom_path()
+
+ggsave("./img/laterals.png", width = 7, height = 5)
+```
+
