@@ -26,8 +26,10 @@ laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = co
   ) %>%
   group_by(rec_date) %>%
   mutate(
-    time_norm = (time - min(time)) / (max(time) - min(time))
-  )
+    time_norm = (time - min(time)) / (max(time) - min(time)),
+    prompt = as.factor(prompt)
+  ) %>%
+  drop_na()
 ```
 
 ```{r plot}
@@ -36,5 +38,18 @@ laterals %>%
   geom_path()
 
 ggsave("./img/laterals.png", width = 7, height = 5)
+```
+
+```{r}
+laterals_gam <- polar_gam(
+  Y ~
+    s(X, by = prompt),
+  data = laterals %>% filter(fan_line > 5, fan_line < 40),
+  fan_lines = c(15, 20)
+)
+```
+
+```{r}
+plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
 ```
 
