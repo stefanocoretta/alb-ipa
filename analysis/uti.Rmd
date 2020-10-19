@@ -40,6 +40,18 @@ laterals %>%
 ggsave("./img/laterals.png", width = 7, height = 5)
 ```
 
+```{r plot-all}
+laterals %>%
+  ggplot(aes(X, Y, group = id, colour = prompt)) +
+  geom_path(alpha = 0.5) +
+  labs(
+    colour = "lateral",
+    x = "back-to-front (mm)", y = "low-to-high (mm)"
+  )
+
+ggsave("./img/laterals-all.png", width = 7, height = 5)
+```
+
 ```{r}
 laterals_gam <- polar_gam(
   Y ~
