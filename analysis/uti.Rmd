@@ -32,6 +32,12 @@ laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = co
     prompt = as.factor(prompt)
   ) %>%
   drop_na()
+
+vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  drop_na()
 ```
 
 # Laterals
@@ -71,3 +77,14 @@ plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
 
 # Vowels
 
+```{r vowels}
+vowels %>%
+  ggplot(aes(X, Y, group = id, colour = prompt, linetype = prompt)) +
+  geom_path() +
+  labs(
+    colour = "vowel", linetype = "vowel",
+    x = "back-to-front (mm)", y = "low-to-high (mm)"
+  )
+
+ggsave("./img/vowels-all.png", width = 7, height = 5)
+```
