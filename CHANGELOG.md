@@ -1,5 +1,9 @@
 # Data changelog
 
+## 2020-10-19
+### Added
+- Spline data for vowels.
+
 ## 2020-10-01
 ### Added
 - Spline data for laterals.
