@@ -11,6 +11,8 @@ theme_set(theme_bw())
 library(rticulate)
 ```
 
+# Read data
+
 ```{r data}
 cols <- c(
   "speaker",
@@ -32,7 +34,9 @@ laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = co
   drop_na()
 ```
 
-```{r plot}
+# Laterals
+
+```{r lateral-splines-alpha}
 laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
   geom_path()
@@ -40,7 +44,7 @@ laterals %>%
 ggsave("./img/laterals.png", width = 7, height = 5)
 ```
 
-```{r plot-all}
+```{r laterals-all}
 laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt)) +
   geom_path(alpha = 0.5) +
@@ -52,7 +56,7 @@ laterals %>%
 ggsave("./img/laterals-all.png", width = 7, height = 5)
 ```
 
-```{r}
+```{r laterals-gam}
 laterals_gam <- polar_gam(
   Y ~
     s(X, by = prompt),
@@ -61,7 +65,9 @@ laterals_gam <- polar_gam(
 )
 ```
 
-```{r}
+```{r laterals-gam-plot}
 plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
 ```
+
+# Vowels
 
