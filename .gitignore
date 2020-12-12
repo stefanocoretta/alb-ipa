@@ -9,6 +9,7 @@ data/recordings/raw/excluded/
 data/recordings/derived/post-align/
 *._
 *.directory
+*.sublime-*
 
 ########
 # R
