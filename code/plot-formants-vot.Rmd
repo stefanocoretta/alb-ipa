@@ -13,6 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
 theme_set(theme_bw())
+library(zoo)
+library(scales)
+library(rticulate)
 
 revlog_trans <- function(base = exp(1)){
     ## Define the desired transformation.
@@ -34,6 +37,8 @@ revlog_trans <- function(base = exp(1)){
 ```
 
 ```{r read-data}
+# Formants
+
 formants <- readRDS("./data/dataframes/formants.rds") %>%
   mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a"))) %>%
   group_by(speaker) %>%
@@ -50,8 +55,61 @@ formants <- readRDS("./data/dataframes/formants.rds") %>%
 formants_all <- readRDS("./data/dataframes/formants_all.rds") %>%
   mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
 
+# VOT
+
 vot <- readRDS("./data/dataframes/vot.rds") %>%
   mutate(consonant =  factor(consonant, levels = c("g", "d", "b", "k", "t", "p")))
+
+# f0
+
+f0 <- readRDS("./data/dataframes/f0.rds") %>%
+  mutate(repetition = as.factor(repetition))
+
+# Intonation
+
+syl <- readRDS("./data/dataframes/syl.rds")
+syl_f0 <- readRDS("./data/dataframes/syl_f0.rds")
+
+# CoG
+
+fric_dft_l <- readRDS("./data/dataframes/fric_dtf_l.rds") %>%
+  mutate(
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
+    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
+  )
+
+cog <- readRDS("./data/dataframes/fric_moments.rds") %>%
+  mutate(
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
+    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
+  )
+
+# UTI
+
+cols <- c(
+  "speaker",
+  "rec_date",
+  "time",
+  "prompt",
+  "label"
+)
+
+laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  group_by(rec_date) %>%
+  mutate(
+    time_norm = (time - min(time)) / (max(time) - min(time)),
+    prompt = as.factor(prompt)
+  ) %>%
+  drop_na()
+
+vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  drop_na()
 ```
 
 # Formants
@@ -234,4 +292,285 @@ vot %>%
   ) +
   scale_color_brewer(type = "qual", palette = 2)
 ggsave("./img/vot-jitter.png", width = 7, height = 4)
+```
+
+# f0
+
+```{r f0-all}
+# all speakers and sentence types together
+f0 %>%
+  ggplot(aes(norm_timepoint, f0, colour = speaker, shape = sentence)) +
+  geom_point(alpha = 0.2) +
+  labs(
+    x = "f0 (Hz)",
+    y = "normalised time"
+  )
+```
+
+```{r f0-by-sentence, out.width="200%"}
+# per sentence type, speakers together
+f0 %>%
+  ggplot(aes(norm_timepoint, f0, colour = speaker, shape = repetition)) +
+  geom_point(alpha = 0.5) +
+  geom_path() +
+  facet_wrap( ~ sentence) +
+  labs(
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r f0-by-token, fig.height=7, out.width="200%"}
+# per sentence type, speakers together
+f0 %>%
+  ggplot(aes(norm_timepoint, f0, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(speaker + repetition ~ sentence) +
+  labs(
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r f0-by-token-smoothed, fig.height=7, out.width="200%"}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(speaker + repetition ~ sentence) +
+  labs(
+    title = "Smoothed f0 contours",
+    caption = "Rolling mean filter, order = 21",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r f0-illustr, fig.height=7, out.width="200%"}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  filter(
+    repetition == 2,
+    speaker == "s01" & sentence_type == "narrow-focus" |
+    speaker == "s01" & sentence_type == "polar-q" |
+    speaker == "s04" & sentence_type == "broad-focus" |
+    speaker == "s04" & sentence_type == "narrow-focus-q"
+  ) %>%
+  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
+  geom_point(size = 0.5) +
+  facet_grid(. ~ sentence) +
+  labs(
+    title = "Smoothed f0 contours",
+    caption = "Rolling mean filter, order = 21",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  theme(legend.pos = "bottom")
+```
+
+```{r f0-by-speaker, out.width="200%"}
+# per speaker, sentences together
+f0 %>%
+  ggplot(aes(norm_timepoint, f0, colour = sentence, shape = repetition)) +
+  facet_wrap(~speaker, nrow = 3) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    x = "f0 (Hz)",
+    y = "normalised time"
+  )
+```
+
+```{r f0-by-sentence-speaker}
+# per sentence and speaker
+f0 %>%
+  filter(speaker == "s01") %>%
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
+  facet_wrap(~ sentence) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    title = "s01",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  ylim(0, 600)
+
+f0 %>%
+  filter(speaker == "s02") %>%
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
+  facet_wrap(~ sentence) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    title = "s02",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  ylim(0, 600)
+
+f0 %>%
+  filter(speaker == "s04") %>%
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
+  facet_wrap(~ sentence) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    title = "s04",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  ylim(0, 600)
+
+f0 %>%
+  filter(speaker == "s05") %>%
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
+  facet_wrap(~ sentence) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    title = "s05",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  ylim(0, 600)
+
+f0 %>%
+  filter(speaker == "s06") %>%
+  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
+  facet_wrap(~ sentence) +
+  geom_point(alpha = 0.5, size = 0.5) +
+  labs(
+    title = "s06",
+    x = "f0 (Hz)",
+    y = "normalised time"
+  ) +
+  ylim(0, 600)
+```
+
+# Intonation
+
+```{r int}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  filter(
+    repetition == 2,
+    speaker == "s01" & sentence_type == "narrow-focus" |
+    speaker == "s01" & sentence_type == "polar-q" |
+    speaker == "s04" & sentence_type == "broad-focus" |
+    speaker == "s04" & sentence_type == "narrow-focus-q"
+  ) %>%
+  ggplot(aes(norm_timepoint, f0_smooth)) +
+    geom_path(aes(colour = speaker), linetype = "dashed") +
+    geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 55, size = 4) +
+    geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
+    geom_vline(aes(xintercept = 1), alpha = 0.5) +
+    facet_wrap(. ~ sentence, ncol = 1) +
+    labs(
+      title = "Smoothed f0 contours",
+      caption = "Rolling mean filter, order = 21",
+      x = "normalised time",
+      y = "f0 (Hz)"
+    ) +
+    ylim(150, 500) +
+    theme(
+      legend.pos = "none",
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.text.x = element_blank()
+    ) +
+    scale_color_brewer(type = "qual")
+
+ggsave("./img/int-plot.png", width = 7, height = 5)
+```
+
+# CoG
+
+## Averaged spectra
+
+```{r average}
+average_dft <- fric_dft_l %>%
+  group_by(ipa, freq)%>%
+  summarise(track_value = mean(track_value))
+```
+
+```{r spectra}
+average_dft %>%
+  filter(freq < 10000) %>%
+  ggplot(aes(x = freq, y = track_value, colour = ipa)) +
+  geom_line() +
+  facet_wrap(~ ipa)
+```
+
+## CoG
+
+```{r cog-plot}
+cog %>%
+  ggplot(aes(ipa, moment_1)) +
+  geom_boxplot() +
+  labs(
+    x = element_blank(),
+    y = "Center of gravity (Hz)"
+  )
+
+ggsave("./img/cog.png", width = 7, height = 5)
+```
+
+```{r means-sd}
+cog %>%
+  group_by(ipa) %>%
+  summarise(mean = round(mean(moment_1), 0), sd = round(sd(moment_1), 0))
+```
+
+# UTI
+
+## Laterals
+
+```{r lateral-splines-alpha}
+laterals %>%
+  ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
+  geom_path()
+
+ggsave("./img/laterals.png", width = 7, height = 5)
+```
+
+```{r laterals-all}
+laterals %>%
+  ggplot(aes(X, Y, group = id, colour = prompt)) +
+  geom_path(alpha = 0.5) +
+  labs(
+    colour = "lateral",
+    x = "back-to-front (mm)", y = "low-to-high (mm)"
+  )
+
+ggsave("./img/laterals-all.png", width = 7, height = 5)
+```
+
+```{r laterals-gam}
+laterals_gam <- polar_gam(
+  Y ~
+    s(X, by = prompt),
+  data = laterals %>% filter(fan_line > 5, fan_line < 40),
+  fan_lines = c(15, 20)
+)
+```
+
+```{r laterals-gam-plot}
+plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
+```
+
+## Vowels
+
+```{r vowels}
+vowels %>%
+  ggplot(aes(X, Y, group = id, colour = prompt, linetype = prompt)) +
+  geom_path() +
+  labs(
+    colour = "vowel", linetype = "vowel",
+    x = "back-to-front (mm)", y = "low-to-high (mm)"
+  )
+
+ggsave("./img/vowels-all.png", width = 7, height = 5)
 ```
