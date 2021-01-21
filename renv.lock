@@ -639,6 +639,13 @@
       "Repository": "CRAN",
       "Hash": "06c85365a03fdaf699966cc1d3cf53ea"
     },
+    "rticulate": {
+      "Package": "rticulate",
+      "Version": "1.7.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1501129d8249a0d4b6528450795e54ac"
+    },
     "rvest": {
       "Package": "rvest",
       "Version": "0.3.6",
@@ -708,6 +715,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a1958587eb651a02273d685fff3819b1"
+    },
+    "tidymv": {
+      "Package": "tidymv",
+      "Version": "3.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6b61dfe5170de6030073611cb95e416a"
     },
     "tidyr": {
       "Package": "tidyr",
