@@ -157,6 +157,15 @@ add_ssffTrackDefinition(db_handle,
                         onTheFlyFunctionName = "ksvF0",
                         verbose = TRUE)
 
+# Add dftSpectrum track ----
+
+add_ssffTrackDefinition(
+  db,
+  name = "dft",
+  onTheFlyFunctionName = "dftSpectrum",
+  verbose = TRUE
+)
+
 # Add release and voice onset level defitions ----
 
 add_levelDefinition(db, "RELS", "EVENT")
