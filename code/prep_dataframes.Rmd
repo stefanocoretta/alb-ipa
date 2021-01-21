@@ -17,6 +17,8 @@ library(tidyverse)
 path <- "./data/alb-ipa_emuDB"
 path2 <- "./data/dataframes"
 db <- load_emuDB(path, verbose = TRUE)
+
+db_int <- load_emuDB("./data/alb-ipa-int_emuDB", verbose = TRUE)
 ```
 
 ## Formants
@@ -254,6 +256,54 @@ And we now save the tibble.
 ```{r save-f0}
 saveRDS(proso, file = "./data/dataframes/f0.rds")
 ```
+
+## Intonation
+
+```{r syl-f0}
+syl <- query(db_int, "SYL =~ .*", calcTimes = T) %>%
+  filter(labels != "<p:>")
+
+syl_f0 <- get_trackdata(db_int, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
+  group_by(session, bundle) %>%
+  mutate(
+    sentence_dur = max(end) - min(start),
+    norm_timepoint = ((times_orig - (min(start)))/sentence_dur)
+  ) %>%
+  rename(f0 = "T1", speaker = "session") %>%
+  mutate(
+    sentence_type = str_sub(bundle, 5),
+    sentence = recode(
+      sentence_type,
+      "broad-focus" = "Lena lau murin.",
+      "narrow-focus" = "Lena lau murin, jo lulen.",
+      "polar-q" = "A e lau Lena murin?",
+      "narrow-focus-q" = "Çfarë lau Lena?"
+      )
+  )
+syl_f0[syl_f0$labels == "çfar(ë)",]$f0 <- 250
+
+syl <- syl %>%
+  group_by(session, bundle) %>%
+  mutate(
+    sentence_duration = max(end) - min(start),
+    start_norm = (start - min(start)) / sentence_duration,
+    end_norm = (end - min(start)) / sentence_duration,
+    sentence_type = str_sub(bundle, 5),
+    sentence = recode(
+      sentence_type,
+      "broad-focus" = "Lena lau murin.",
+      "narrow-focus" = "Lena lau murin, jo lulen.",
+      "polar-q" = "A e lau Lena murin?",
+      "narrow-focus-q" = "Çfarë lau Lena?"
+      )
+  )
+```
+
+```{r save-syl-f0}
+saveRDS(syl_f0, "./data/dataframes/syl_f0.rds")
+saveRDS(syl, "./data/dataframes/syl.rds")
+```
+
 
 ## Spectral moments (CoG)
 
