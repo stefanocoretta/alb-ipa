@@ -116,16 +116,16 @@ vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = cols) 
 
 ```{r all}
 # all speakers together
-ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
-  scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label=vowel), show.legend=FALSE) +
-  stat_ellipse(type="t", size=1)
-ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
-  scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label=vowel), show.legend=FALSE) +
-  stat_ellipse(type="norm", size=1)
+ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "t", size = 1)
+ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "norm", size = 1)
 ```
 
 ```{r all-z}
@@ -187,61 +187,61 @@ ggsave("./img/vowel-plot-z-hz-log.png", width = 7, height = 5)
 # male speakers only
 formants %>%
   filter(gender == "M") %>%
-  ggplot(aes(x=F2, y=F1, col=vowel)) +
-    scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-    scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-    geom_text(aes(label=vowel), show.legend=FALSE) +
-    stat_ellipse(type="t", size=1)
+  ggplot(aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "t", size = 1)
 formants %>%
   filter(gender == "M") %>%
-  ggplot(aes(x=F2, y=F1, col=vowel)) +
-    scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-    scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-    geom_text(aes(label=vowel), show.legend=FALSE) +
-    stat_ellipse(type="norm", size=1)
+  ggplot(aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "norm", size = 1)
 ```
 
 ```{r females}
 # female speakers only
 formants %>%
   filter(gender == "F") %>%
-  ggplot(aes(x=F2, y=F1, col=vowel)) +
-    scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-    scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-    geom_text(aes(label=vowel), show.legend=FALSE) +
-    stat_ellipse(type="t", size=1)
+  ggplot(aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "t", size = 1)
 formants %>%
   filter(gender == "F") %>%
-  ggplot(aes(x=F2, y=F1, col=vowel)) +
-    scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-    scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-    geom_text(aes(label=vowel), show.legend=FALSE) +
-    stat_ellipse(type="norm", size=1)
+  ggplot(aes(x = F2, y = F1, col = vowel)) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "norm", size = 1)
 ```
 
 ```{r all-facet}
 # male-female side by side
-ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
-  facet_wrap(~gender) +
-  scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label=vowel), show.legend=FALSE) +
-  stat_ellipse(type="t", size=1)
-ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
-  facet_wrap(~gender) +
-  scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label=vowel), show.legend=FALSE) +
-  stat_ellipse(type="norm", size=1)
+ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
+  facet_wrap( ~ gender) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "t", size = 1)
+ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
+  facet_wrap( ~ gender) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE) +
+  stat_ellipse(type = "norm", size = 1)
 ```
 
 ```{r each}
 # individual speakers side by side
-ggplot(formants, aes(x=F2, y=F1, col=vowel)) +
-  facet_wrap(~speaker) +
-  scale_x_reverse(name="F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name="F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label=vowel), show.legend=FALSE)
+ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
+  facet_wrap( ~ speaker) +
+  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
+  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
+  geom_text(aes(label = vowel), show.legend = FALSE)
 ```
 
 ## All vowels
@@ -269,9 +269,11 @@ formants_all %>%
 # VOT
 
 ```{r vot-bar}
-ggplot(vot, aes(x=VOT, y=consonant)) +
+ggplot(vot, aes(x = VOT, y = consonant)) +
   stat_summary(fun = mean, geom = "bar") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", color="red")
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               color = "red")
 ```
 
 ```{r vot-dist}
@@ -520,7 +522,7 @@ ggsave("./img/int-all-plot.png", width = 14, height = 10)
 
 ```{r average}
 average_dft <- fric_dft_l %>%
-  group_by(ipa, freq)%>%
+  group_by(ipa, freq) %>%
   summarise(track_value = mean(track_value))
 ```
 
