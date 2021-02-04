@@ -486,6 +486,34 @@ f0 %>%
 ggsave("./img/int-plot.png", width = 7, height = 5)
 ```
 
+```{r int-all}
+f0 %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  ggplot(aes(norm_timepoint, f0_smooth)) +
+    geom_path(aes(colour = speaker, linetype = speaker), size = 0.7) +
+    geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 55, size = 4) +
+    geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
+    geom_vline(aes(xintercept = 1), alpha = 0.5) +
+    facet_wrap(~ sentence, ncol = 1) +
+    labs(
+      title = "Smoothed f0 contours",
+      caption = "Rolling mean filter, order = 21",
+      x = "normalised time",
+      y = "f0 (Hz)"
+    ) +
+    ylim(0, 1000) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.text.x = element_blank()
+    ) +
+    scale_color_brewer(type = "qual")
+
+ggsave("./img/int-all-plot.png", width = 14, height = 10)
+```
+
 # CoG
 
 ## Averaged spectra
