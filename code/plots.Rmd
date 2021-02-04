@@ -504,7 +504,7 @@ f0 %>%
       x = "normalised time",
       y = "f0 (Hz)"
     ) +
-    ylim(0, 1000) +
+    ylim(50, 600) +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
