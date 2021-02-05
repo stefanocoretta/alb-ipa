@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
-theme_set(theme_bw())
+theme_set(theme_minimal(base_family = "Lato"))
 library(zoo)
 library(scales)
 library(rticulate)
@@ -595,12 +595,14 @@ ggsave("./img/laterals.png", width = 7, height = 5)
 
 ```{r laterals-all}
 laterals %>%
+  mutate(prompt = recode_factor(prompt, ala = "/l/", alla = "/ɫ/")) %>%
   ggplot(aes(X, Y, group = id, colour = prompt)) +
-  geom_path(alpha = 0.5) +
+  geom_path(alpha = 0.7) +
   labs(
     colour = "lateral",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
-  )
+  ) +
+  scale_color_brewer(type = "qual")
 
 ggsave("./img/laterals-all.png", width = 7, height = 5)
 ```
