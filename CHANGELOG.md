@@ -1,5 +1,18 @@
 # Data changelog
 
+## 2021-02-05
+
+### Added
+
+- CoG of affricates.
+
+### Removed
+
+- ⚠️ BREAKING CHANGES: `alb-ipa_emuDB` is now part of the `alb-ipa` repo and not a submodule. This means that the bundle assignments won't work anymore.
+
+
+
+
 ## 2020-10-19
 ### Added
 - Spline data for vowels.
