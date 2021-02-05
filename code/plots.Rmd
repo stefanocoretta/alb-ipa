@@ -74,14 +74,44 @@ syl_f0 <- readRDS("./data/dataframes/syl_f0.rds")
 
 fric_dft_l <- readRDS("./data/dataframes/fric_dtf_l.rds") %>%
   mutate(
-    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
-    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ")
   )
 
-cog <- readRDS("./data/dataframes/fric_moments.rds") %>%
+affr_dft_l <- readRDS("./data/dataframes/affr_dft_l.rds") %>%
   mutate(
-    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ"),
-    ipa = factor(ipa, levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h"))
+    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ")
+  )
+
+dft_l <- bind_rows(fric_dft_l, affr_dft_l) %>%
+  mutate(
+    ipa = factor(
+      ipa,
+      levels = c(
+        "f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h",
+        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ"
+      )
+    )
+  )
+
+fric_moments <- readRDS("./data/dataframes/fric_moments.rds") %>%
+  mutate(
+    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ")
+  )
+
+affr_moments <- readRDS("./data/dataframes/affr_moments.rds")  %>%
+  mutate(
+    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ")
+  )
+
+moments <- bind_rows(fric_moments, affr_moments) %>%
+  mutate(
+    ipa = factor(
+      ipa,
+      levels = c(
+        "f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h",
+        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ"
+      )
+    )
   )
 
 # UTI
@@ -543,14 +573,14 @@ ggsave("./img/int-decl-plot.png", width = 10, height = 14)
 ```
 
 
-# CoG
+# Spectral DFT and moments
 
-## Averaged spectra
+## Averaged spectral dft
 
-```{r average}
-average_dft <- fric_dft_l %>%
+```{r averaged-spectra}
+average_dft <- dft_l %>%
   group_by(ipa, freq) %>%
-  summarise(track_value = mean(track_value))
+  summarise(track_value = mean(track_value), .groups = "drop")
 ```
 
 ```{r spectra}
@@ -558,15 +588,17 @@ average_dft %>%
   filter(freq < 10000) %>%
   ggplot(aes(x = freq, y = track_value, colour = ipa)) +
   geom_line() +
-  facet_wrap(~ ipa)
+  facet_wrap(~ ipa, ncol = 3)
 ```
 
-## CoG
+## Spectral moments
 
 ```{r cog-plot}
-cog %>%
+moments %>%
   ggplot(aes(ipa, moment_1)) +
-  geom_boxplot() +
+  geom_violin() +
+  geom_boxplot(width = 0.1) +
+  geom_jitter(alpha = 0.3, width = 0.2) +
   labs(
     x = element_blank(),
     y = "Center of gravity (Hz)"
@@ -575,11 +607,12 @@ cog %>%
 ggsave("./img/cog.png", width = 7, height = 5)
 ```
 
-```{r means-sd}
-cog %>%
+```{r cog-means-sd}
+moments %>%
   group_by(ipa) %>%
   summarise(mean = round(mean(moment_1), 0), sd = round(sd(moment_1), 0))
 ```
+
 
 # UTI
 
