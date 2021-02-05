@@ -307,6 +307,8 @@ saveRDS(syl, "./data/dataframes/syl.rds")
 
 ## Spectral moments (CoG)
 
+### Fricatives
+
 ```{r fric}
 # Get query list
 fric_segs <- query(
@@ -316,7 +318,7 @@ fric_segs <- query(
 )
 ```
 
-```{r dft}
+```{r fric-dft}
 # Get dft in wide format
 fric_dft <- get_trackdata(
   db,
@@ -329,7 +331,7 @@ fric_dft <- get_trackdata(
 fric_dft_l <- convert_wideToLong(fric_dft, calcFreqs = T)
 ```
 
-```{r moments}
+```{r fric-moments}
 # Get spectral moments
 fric_moments <- fric_dft_l %>%
   filter(freq < 10000) %>%
@@ -343,10 +345,64 @@ fric_moments %>%
   summarise(mean = mean(moment_1), sd = sd(moment_1))
 ```
 
-```{r save-dft-moments}
+```{r save-fric-dft-moments}
 saveRDS(fric_dft_l, file = "./data/dataframes/fric_dtf_l.rds")
 saveRDS(fric_moments, file = "./data/dataframes/fric_moments.rds")
 ```
+
+### Affricates
+
+```{r affr}
+# Get query list
+affr_rels = query(
+  db,
+  "RELS =~ .*",
+  bundlePattern = "[0-9]*-(cica|xixa|5aji|xhaja|qava|gjaku)", 
+  calcTimes = T)
+
+affr_segs = requery_hier(
+  db,
+  affr_rels,
+  level = 'MAU')
+
+# Replace start of segments with time of release
+affr_segs$start = affr_rels$start
+```
+
+```{r affr-dft}
+# Get data in wide format
+affr_dft = get_trackdata(
+  db,
+  seglist = affr_segs,
+  ssffTrackName = "dft",
+  resultType = "tibble",
+  cut = 0.5)
+
+
+affr_dft_l = convert_wideToLong(affr_dft, calcFreqs = T)
+```
+
+```{r affr-moments}
+# Get spectral moments
+affr_moments = affr_dft_l %>%
+  filter(freq < 10000) %>%
+  group_by(labels, sl_rowIdx) %>%
+  do(data_frame(moments = moments(.$track_value,.$freq, minval = TRUE))) %>%
+  mutate(moment_num = paste0("moment_", 1:(table(sl_rowIdx)))) %>%
+  pivot_wider(names_from = "moment_num", values_from = "moments")
+
+affr_moments %>%
+  group_by(labels) %>%
+  summarise(mean = mean(moment_1), sd = sd(moment_1))
+```
+
+
+```{r save-affr-dft-moments}
+# save dataframes
+saveRDS(affr_dft_l, file = "./data/dataframes/affr_dft_l.rds")
+saveRDS(affr_moments, file = "./data/dataframes/affr_moments.rds")
+```
+
 
 ## Examples
 
@@ -361,7 +417,7 @@ pata <- query(
 export_seglistToTxtCollection(db, pata, "./data/varia/vot-example/")
 ```
 
-```{r}
+```{r qgj}
 qgj <- query(
   db,
   "[ORT-MAU == gjaku|qava]",
