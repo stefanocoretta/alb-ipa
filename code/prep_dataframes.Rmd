@@ -348,3 +348,15 @@ saveRDS(fric_dft_l, file = "./data/dataframes/fric_dtf_l.rds")
 saveRDS(fric_moments, file = "./data/dataframes/fric_moments.rds")
 ```
 
+## Example of VOT segmentation
+
+```{r pata}
+pata <- query(
+  db,
+  "[ORT-MAU == pata]",
+  bundlePattern = "018-pata",
+  sessionPattern = "s04"
+)
+
+export_seglistToTxtCollection(db, pata, "./data/varia/vot-example/")
+```
