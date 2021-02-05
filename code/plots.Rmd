@@ -516,6 +516,33 @@ f0 %>%
 ggsave("./img/int-all-plot.png", width = 14, height = 10)
 ```
 
+```{r int-decl}
+f0 %>%
+  filter(sentence == "Lena lau murin.") %>%
+  group_by(token) %>%
+  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
+  ggplot(aes(norm_timepoint, f0_smooth)) +
+    geom_path(aes(colour = speaker, linetype = repetition), size = 0.7) +
+    facet_wrap(~ speaker, ncol = 1, scales = "free") +
+    labs(
+      title = "Smoothed f0 contours",
+      caption = "Rolling mean filter, order = 21",
+      x = "normalised time",
+      y = "f0 (Hz)"
+    ) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.text.x = element_blank()
+    ) +
+    scale_color_brewer(type = "qual") +
+    theme_dark()
+
+ggsave("./img/int-decl-plot.png", width = 10, height = 14)
+```
+
+
 # CoG
 
 ## Averaged spectra
