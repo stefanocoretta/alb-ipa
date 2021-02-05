@@ -348,7 +348,7 @@ saveRDS(fric_dft_l, file = "./data/dataframes/fric_dtf_l.rds")
 saveRDS(fric_moments, file = "./data/dataframes/fric_moments.rds")
 ```
 
-## Example of VOT segmentation
+## Examples
 
 ```{r pata}
 pata <- query(
@@ -360,3 +360,15 @@ pata <- query(
 
 export_seglistToTxtCollection(db, pata, "./data/varia/vot-example/")
 ```
+
+```{r}
+qgj <- query(
+  db,
+  "[ORT-MAU == gjaku|qava]",
+  bundlePattern = "(044|038).*",
+  sessionPattern = "s04"
+)
+
+export_seglistToTxtCollection(db, qgj, "./data/varia/qgj-example/")
+```
+
