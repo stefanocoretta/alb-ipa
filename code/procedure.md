@@ -4,38 +4,46 @@
 
 Speakers were recorded in the Phonetics Laboratory at the IPS.
 
-The raw (original) recordings are saved in `data/recordings/raw/` with the name template `Subject_0_GENDER.wav`, where `0` is the speaker's ID number and `GENDER` is either `Female` or `Male`.
+The raw (original) recordings are saved in `data/recordings/raw/` with the name template `Subject_<00>_<GENDER>.wav`, where `<00>` is the speaker's ID number and `<GENDER>` is either `Female` or `Male`.
 The raw recordings are stereo audio files.
 These have been converted to mono (same file name plus `_mono` suffix).
 The TextGrids in `data/recordings/raw/` were manually created to specify intervals in the audio containing the word list, the sentences, the story (tier 1 `type`, possible labels `words`, `sentences`,  `story`), and intervals the audio within which is to be silenced (tier 2 `silenced`, label `silence`).
 
 ## Force-alignment
 
-The Praat script `code/get_prealign_chunks.praat` was run to extract the audio chunks (`words.wav`, `sentences.wav`, `story.wav`) used with webMAUS (force-alignment).
-The alignment `.txt` files (`words.txt`, `sentence.txt`, `story.txt`, used with webMAUS) were manually created to reflect the actual order of the stimuli in the recordings.
-The alignment files of each speaker are saved in `data/recordings/derived/align/s00/`, where `00` is the speaker's ID number.
+Force-aligned phonetic segmentation was achieved with the BAS web service [Pipeline without ASR](https://clarin.phonetik.uni-muenchen.de/BASWebServices/interface/Pipeline).
 
-Force-alignment was achieved with the BAS web service `Pipeline without ASR` with the following settings:
+The service requires two inputs:
 
-- Pipeline name: G2P->MAUS
-- Language: Language independent
-- Output format: Praat
-- Keep everything: false
-- Expert options > Imap mapping file (G2P): browse to the custom grapheme to phoneme (G2P) mapping file (`data/varia/sqi-AL_map.txt`)
+- The audio files to force-align,
+- and the respective transcripts in original spelling (Albanian in this case).
 
-The output TextGrids with the force-aligned annotation are saved in each speaker's folder in`data/recordings/derived/align/`.
+The Praat script `code/get_prealign_chunks.praat` was run to chunk each speaker's audio file into three separate audio files, containing the word list, the sentences, and the story (the files are named `words.wav`, `sentences.wav`, `story.wav` respectively).
+The transcript files (`words.txt`, `sentence.txt`, `story.txt`) were manually created to reflect the actual order of the stimuli in the recordings for each speaker.
+
+The service was run with the following settings:
+
+- Pipeline name: `G2P->MAUS`.
+- Language: `Language independent (sampa)`.
+- Output format: `Praat`.
+- Keep everything: `false`.
+- Expert options > `Imap mapping file (G2P)`.
+
+The custom grapheme to phoneme (G2P) `imap` mapping file can be found in `data/varia/sqi-AL_map.txt`.
+
+The service outputs Praat `.TextGrid` files containing the force-aligned segmentation of the three audio files of each speaker, which were saved in `data/recordings/derived/align/s<00>/`, where `<00>` is the speaker's ID number.
 
 The `sentence.TextGrid` files needed to be manually changed by adding an extra tier which includes a sentence-level segmentation (MAUS output currently does not include a sentence-level segmentation tier).
 The extra tier, called `sent`, was added as tier 1.
 The intervals in `sent` contain the following labels according to the type of the sentence: `broad-focus`, `polar-q`, `narrow-focus-q`, `narrow-focus`.
 
-The Praat script `code/get_postalign_chunks.praat` was then run to extract individual audio and TextGrid chunks which were later converted into the EMU database (see below).
-The output of this script gets saved in `data/recordings/derived/post-align/`.
-This folder is ignored by git.
+The Praat script `code/get_postalign_chunks.praat` was then run to extract individual audio and TextGrid chunks which were later imported into the EMU database (see below).
+The output of this script is saved in `data/recordings/derived/post-align/`.
+This folder is ignored by the versioning systems, to avoid data duplication (these files live in `data/alb-ipa_emuDB`).
 
 ## EMU database creation
 
-The post-alignment chunks in `data/recordings/derived/post-align/` were then converted into the EMU database `data/alb-ipa_emuDB/`:
+The post-alignment chunks in `data/recordings/derived/post-align/` were then imported into an [EMU-SDMS](http://ips-lmu.github.io/EMU.html) database in `data/alb-ipa_emuDB/`:
 
 ```r
 library(emuR)
@@ -47,44 +55,47 @@ convert_TextGridCollection(
 ```
 
 The contents of the created `data/recordings/alb-ipa_emuDB/alb-ipa_emuDB/` were moved to `data/recordings/alb-ipa_emuDB/` (as of emuR 2.0.4 there is no straightforward way to create a DB in an already existing folder; rather, a new folder is created).
-The EMU database is a git submodule.
 
-## Build hierarchy, get formants/f0 tracks
+## EMU database configuration
 
-The script `code/add_hier_formants_f0.R` was run to build the annotation hierarchy, get formants and f0 tracks.
-The script also adds two level definitions: `RELS` (EVENT) for the annotation of stop releases, and `VOI` (EVENT) for the annotation of voice onset (see below).
+The script `code/config/emu_config.R` holds the code use to configure the EMU database.
 
-The hierarchy:
+This script builds the annotation hierarchy and adds level definitions and tracks.
+
+The annotation hierarchy is as follows:
 
 - `ORT-MAU`: spelling.
 - `KANN-MAU`: MAUS word transcription.
 - `MAU`: MAUS segment transcription.
 
-Formant tracks were obtained with the `praatFms` function from wrassp.
+Two level definitions are added: `RELS` (EVENT) for the annotation of stop releases, and `VOI` (EVENT) for the annotation of voice onset (see below).
+
+The tracks (formants, f0, DFT spectrum) were created with `emuR::add_ssffTrackDefinition()`, using on-the-fly functions from wrassp.
+
+Formant tracks were obtained with `wrassp::praatFms()`.
 This function uses Praat's algorithm.
 The following settings were used:
 
-- Number of formants: 5.
-- Maximum frequency: 5500.
-- Window length: 0.025.
-- Pre-emphasis from: 50.
+- Number of formants: `5`.
+- Maximum frequency: `5500`.
+- Window length: `0.025`.
+- Pre-emphasis from: `50`.
 
-F0 tracks were obtained with the `ksvF0` function from wrassp.
+f0 tracks were obtained with `wrassp::ksvF0()`.
 
-## Annotation correction
+DFT spectrum tracks were added with `wrasp::dftSpectrum()`.
 
-The automatic segmentation by BAS was manually corrected by the researchers, as follows:
+## Segmentation correction
+
+The force-aligned segmentation generated by BAS was manually corrected with the the EMU webAPP by the researchers, as follows:
 
 - Words: all segments were corrected.
 - Sentences: only word boundaries were corrected.
 - Story: nothing was corrected.
 
-The formant tracks were corrected in the words.
+The formant trajectories were corrected with the EMU webAPP the word list files, but not in the sentences and story files.
 
-## Annotate stop releases and voice onset
+## Annotation of stop releases and voice onset
 
-The time of stop release for /p, b, t, d, k, g/ was manually annotated in the `RELS` level.
-Only word-initial stops from "consonant" words were annotated.
+The *time of the closure release* and the *voice onset time* was manually annotated for /p, b, t, d, k, g, ts, dz, tʃ, dʒ, t̻ʃ̻, d̻ʒ̻/, in the `RELS` and `VOI` event levels respectively.
 
-The time of voice onset for /p, b, t, d, k, g/ was manually annotated in the `VOI` level.
-Only word-initial stops from "consonant" words were annotated.
