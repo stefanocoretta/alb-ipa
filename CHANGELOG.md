@@ -1,5 +1,17 @@
 # Data changelog
 
+## 2021-02-06
+
+## Added
+
+- Use dvc to track data/.
+
+### Removed
+
+- git lfs has been removed and replaced with dvc.
+
+
+
 ## 2021-02-05
 
 ### Added
