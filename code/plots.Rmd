@@ -1,8 +1,8 @@
 ---
 title: "Plot formants and VOT"
 date: "23/06/2020"
-output: 
-  html_document: 
+output:
+  html_document:
     highlight: tango
     number_sections: yes
     theme: paper
@@ -105,14 +105,24 @@ affr_moments <- readRDS("./data/dataframes/affr_moments.rds")  %>%
 
 moments <- bind_rows(fric_moments, affr_moments) %>%
   mutate(
-    ipa = factor(
-      ipa,
-      levels = c(
-        "f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h",
-        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ"
-      )
-    )
-  )
+    ipa = factor(ipa,
+      levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h", "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ")
+    ),
+    voicing = ifelse(ipa %in% c("f", "θ", "s", "ʃ", "ts", "tʃ", "t̻ʃ̻", "h"), "voiceless", "voiced"),
+    voicing = factor(voicing, levels = c("voiceless", "voiced")),
+    poa = case_when(
+      ipa %in% c("f", "v") ~ "labial",
+      ipa %in% c("s", "z", "ts", "dz") ~ "alveolar",
+      ipa %in% c("θ", "ð") ~ "dental",
+      ipa %in% c("tʃ", "dʒ", "ʃ", "ʒ") ~ "apico-postalveolar",
+      ipa %in% c("t̻ʃ̻", "d̻ʒ") ~ "lamino-postalveolar",
+      ipa %in% c("h") ~ "glottal"
+    ),
+    poa = factor(poa, levels = c("labial", "dental", "alveolar", "apico-postalveolar", "lamino-postalveolar", "glottal")),
+    manner = ifelse(ipa %in% c("f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "h"), "fricatives", "affricates"),
+    manner = factor(manner, levels = c("fricatives", "affricates")),
+    voicing_manner = factor(paste(voicing, manner), levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))
+)
 
 # UTI
 
@@ -595,14 +605,26 @@ average_dft %>%
 
 ```{r cog-plot}
 moments %>%
+  # add phantom voiceless glottal fricative
+  bind_rows(tibble(labels = NA, sl_rowIdx = NA, moment_1 = NA, moment_2 = NA,
+      moment_3 = NA, moment_4 = NA, ipa = NA, voicing = NA, poa = NA,
+      manner = NA, voicing_manner = "voiced fricatives"
+  )) %>%
+  mutate(voicing_manner = factor(voicing_manner, levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))) %>%
   ggplot(aes(ipa, moment_1)) +
-  geom_violin() +
+  geom_jitter(
+    aes(colour = poa), alpha = 0.5,
+    position = position_jitter(width = 0.1, seed = 2534)
+  ) +
+  geom_violin(fill = NA) +
   geom_boxplot(width = 0.1) +
-  geom_jitter(alpha = 0.3, width = 0.2) +
+  facet_wrap(~ voicing_manner, scales = "free_x") +
   labs(
     x = element_blank(),
-    y = "Center of gravity (Hz)"
-  )
+    y = "Centre of gravity (Hz)"
+  ) +
+  theme_light() +
+  theme(legend.position = "none")
 
 ggsave("./img/cog.png", width = 7, height = 5)
 ```
