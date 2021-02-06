@@ -9,7 +9,7 @@ data/recordings/raw/excluded/
 data/recordings/derived/post-align/
 *._
 *.directory
-*.sublime-*
+alb-ipa.sublime-workspace
 
 ########
 # R
@@ -262,3 +262,4 @@ TSWLatexianTemp*
 # expex forward references with \gathertags
 *-tags.tex
 .Rproj.user
+/data
