@@ -183,7 +183,7 @@ formants %>%
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/vowel-plot.png", width = 7, height = 5)
+ggsave("./img/f1f2-z.png", width = 7, height = 5)
 ```
 
 ```{r all-z-hz}
@@ -201,7 +201,7 @@ formants %>%
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/vowel-plot-z-hz.png", width = 7, height = 5)
+ggsave("./img/f1f2-z-hz.png", width = 7, height = 5)
 ```
 
 ```{r all-z-hz-log}
@@ -220,7 +220,7 @@ formants %>%
   scale_color_brewer(type = "qual", palette = 2) +
   geom_abline(slope = 1, intercept = 0)
 
-ggsave("./img/vowel-plot-z-hz-log.png", width = 7, height = 5)
+ggsave("./img/f1f2-z-hz-log.png", width = 7, height = 5)
 ```
 
 ```{r males}
@@ -525,7 +525,7 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/int-plot.png", width = 7, height = 5)
+ggsave("./img/intonation.png", width = 7, height = 5)
 ```
 
 ```{r int-all}
@@ -553,7 +553,7 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/int-all-plot.png", width = 14, height = 10)
+ggsave("./img/intonation-all.png", width = 14, height = 10)
 ```
 
 ```{r int-decl}
@@ -579,7 +579,7 @@ f0 %>%
     scale_color_brewer(type = "qual") +
     theme_dark()
 
-ggsave("./img/int-decl-plot.png", width = 10, height = 14)
+ggsave("./img/intonation-decl.png", width = 10, height = 14)
 ```
 
 
@@ -645,7 +645,7 @@ laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
   geom_path()
 
-ggsave("./img/laterals.png", width = 7, height = 5)
+ggsave("./img/uti-laterals.png", width = 7, height = 5)
 ```
 
 ```{r laterals-all}
@@ -659,10 +659,10 @@ laterals %>%
   ) +
   scale_color_brewer(type = "qual")
 
-ggsave("./img/laterals-all.png", width = 7, height = 5)
+ggsave("./img/uti-laterals-all.png", width = 7, height = 5)
 ```
 
-```{r laterals-gam}
+```{r laterals-gam, eval=FALSE}
 laterals_gam <- polar_gam(
   Y ~
     s(X, by = prompt),
@@ -671,7 +671,7 @@ laterals_gam <- polar_gam(
 )
 ```
 
-```{r laterals-gam-plot}
+```{r laterals-gam-plot, eval=FALSE}
 plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
 ```
 
@@ -686,5 +686,5 @@ vowels %>%
     x = "back-to-front (mm)", y = "low-to-high (mm)"
   )
 
-ggsave("./img/vowels-all.png", width = 7, height = 5)
+ggsave("./img/uti-vowels-all.png", width = 7, height = 5)
 ```
