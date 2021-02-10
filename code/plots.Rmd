@@ -16,6 +16,7 @@ theme_set(theme_minimal(base_family = "Lato"))
 library(zoo)
 library(scales)
 library(rticulate)
+library(Manu)
 
 revlog_trans <- function(base = exp(1)){
     ## Define the desired transformation.
@@ -199,7 +200,7 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
   theme(legend.position = "none") +
-  scale_color_brewer(type = "qual", palette = 2)
+  scale_color_manual(values = get_pal("Kea"))
 
 ggsave("./img/f1f2-z-hz.png", width = 7, height = 5)
 ```
@@ -326,13 +327,13 @@ vot %>%
 ```{r vot-jitter}
 vot %>%
   ggplot(aes(consonant, VOT, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.25, size = 3.5, alpha = 0.7) +
+  geom_jitter(width = 0.25, size = 3.5, alpha = 0.9) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
   labs(
     y = "VOT (ms)"
   ) +
-  scale_color_brewer(type = "qual", palette = 2)
+  scale_color_manual(values = get_pal("Kaka"))
 ggsave("./img/vot-jitter.png", width = 7, height = 4)
 ```
 
@@ -500,30 +501,30 @@ f0 %>%
     repetition == 2,
     speaker == "s01" & sentence_type == "narrow-focus" |
     speaker == "s01" & sentence_type == "polar-q" |
-    speaker == "s04" & sentence_type == "broad-focus" |
-    speaker == "s04" & sentence_type == "narrow-focus-q"
+    speaker == "s05" & sentence_type == "broad-focus" |
+    speaker == "s04" & sentence_type == "narrow-focus-q",
+    f0 > 0
   ) %>%
   ggplot(aes(norm_timepoint, f0_smooth)) +
-    geom_path(aes(colour = speaker), linetype = "dashed") +
-    geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 55, size = 4) +
+    geom_path(aes(colour = speaker), linetype = "31", size = 1) +
+    geom_text(data = syl_f0, aes(norm_timepoint, -50, label = labels), size = 4) +
     geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
     geom_vline(aes(xintercept = 1), alpha = 0.5) +
     facet_wrap(. ~ sentence, ncol = 1) +
+    ylim(-100, 500) +
     labs(
       title = "Smoothed f0 contours",
       caption = "Rolling mean filter, order = 21",
       x = "normalised time",
       y = "f0 (Hz)"
     ) +
-    ylim(150, 500) +
     theme(
-      legend.pos = "none",
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
       panel.grid.minor.y = element_blank(),
       axis.text.x = element_blank()
     ) +
-    scale_color_brewer(type = "qual")
+    scale_color_manual(values = get_pal("Kaka"))
 
 ggsave("./img/intonation.png", width = 7, height = 5)
 ```
@@ -613,7 +614,7 @@ moments %>%
   mutate(voicing_manner = factor(voicing_manner, levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))) %>%
   ggplot(aes(ipa, moment_1)) +
   geom_jitter(
-    aes(colour = poa), alpha = 0.5,
+    aes(colour = poa), alpha = 0.7,
     position = position_jitter(width = 0.1, seed = 2534)
   ) +
   geom_violin(fill = NA) +
@@ -624,7 +625,8 @@ moments %>%
     y = "Centre of gravity (Hz)"
   ) +
   theme_light() +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  scale_color_manual(values = get_pal("Putangitangi"))
 
 ggsave("./img/cog.png", width = 7, height = 5)
 ```
@@ -657,7 +659,7 @@ laterals %>%
     colour = "lateral",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
   ) +
-  scale_color_brewer(type = "qual")
+  scale_color_manual(values = get_pal("Kaka"))
 
 ggsave("./img/uti-laterals-all.png", width = 7, height = 5)
 ```
