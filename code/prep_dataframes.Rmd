@@ -213,13 +213,17 @@ proso <- proso %>%
     "segment" = "labels",
     "speaker" = "session"
   )
-proso$sentence_type <- factor(substring(proso$bundle, 5))
-proso$sentence <- recode(
-  proso$sentence_type,
-  "broad-focus" = "Lena lau murin.",
-  "narrow-focus" = "Lena lau murin, jo lulen.",
-  "polar-q" = "A e lau Lena murin?",
-  "narrow-focus-q" = "Çfarë lau Lena?"
+
+proso <- proso %>%
+  mutate(
+    sentence_type = factor(substring(bundle, 5)),
+    sentence = recode(
+      sentence_type,
+      "broad-focus" = "(a) Lena lau murin.",
+      "narrow-focus" = "(b) Lena lau murin, jo lulen.",
+      "polar-q" = "(c) A e lau Lena murin?",
+      "narrow-focus-q" = "(d) Çfarë lau Lena?"
+      )
   )
 ```
 
@@ -274,10 +278,10 @@ syl_f0 <- get_trackdata(db_int, seglist = syl, ssffTrackName = "F0", cut = 0.5) 
     sentence_type = str_sub(bundle, 5),
     sentence = recode(
       sentence_type,
-      "broad-focus" = "Lena lau murin.",
-      "narrow-focus" = "Lena lau murin, jo lulen.",
-      "polar-q" = "A e lau Lena murin?",
-      "narrow-focus-q" = "Çfarë lau Lena?"
+      "broad-focus" = "(a) Lena lau murin.",
+      "narrow-focus" = "(b) Lena lau murin, jo lulen.",
+      "polar-q" = "(c) A e lau Lena murin?",
+      "narrow-focus-q" = "(d) Çfarë lau Lena?"
       )
   )
 syl_f0[syl_f0$labels == "çfar(ë)",]$f0 <- 250
@@ -291,10 +295,10 @@ syl <- syl %>%
     sentence_type = str_sub(bundle, 5),
     sentence = recode(
       sentence_type,
-      "broad-focus" = "Lena lau murin.",
-      "narrow-focus" = "Lena lau murin, jo lulen.",
-      "polar-q" = "A e lau Lena murin?",
-      "narrow-focus-q" = "Çfarë lau Lena?"
+      "broad-focus" = "(a) Lena lau murin.",
+      "narrow-focus" = "(b) Lena lau murin, jo lulen.",
+      "polar-q" = "(c) A e lau Lena murin?",
+      "narrow-focus-q" = "(d) Çfarë lau Lena?"
       )
   )
 ```
