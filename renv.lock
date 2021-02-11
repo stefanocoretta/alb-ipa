@@ -252,12 +252,26 @@
       "Repository": "CRAN",
       "Hash": "a96728288c75a814c900af9da84387be"
     },
+    "crosstalk": {
+      "Package": "crosstalk",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2b06f9e415a62b6762e4b8098d2aecbc"
+    },
     "curl": {
       "Package": "curl",
       "Version": "4.3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "2b7d10581cc730804e9ed178c8374bd6"
+    },
+    "data.table": {
+      "Package": "data.table",
+      "Version": "1.13.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "813fa8857aaa949b243e2e0b4abb8592"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -448,6 +462,13 @@
       "Repository": "CRAN",
       "Hash": "af2c2531e55df5cf230c4b5444fc973c"
     },
+    "htmlwidgets": {
+      "Package": "htmlwidgets",
+      "Version": "1.5.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6fdaa86d0700f8b3e92ee3c445a5a10d"
+    },
     "httpuv": {
       "Package": "httpuv",
       "Version": "1.5.5",
@@ -517,6 +538,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "fbd9285028b0263d76d18c95ae51a53d"
+    },
+    "lazyeval": {
+      "Package": "lazyeval",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d908914ae53b04d4c0c0fd72ecc35370"
     },
     "lifecycle": {
       "Package": "lifecycle",
@@ -636,6 +664,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "09eb987710984fc2905c7129c7d85e65"
+    },
+    "plotly": {
+      "Package": "plotly",
+      "Version": "4.9.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f6b85d9e4ed88074ea0ede1aa74bb00e"
     },
     "praise": {
       "Package": "praise",
