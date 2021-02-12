@@ -695,7 +695,7 @@ ggsave("./img/uti-vowels-all.png", width = 7, height = 5)
 ```{r vowels-gam, eval=FALSE}
 vowels_gam <- polar_gam(
   Y ~
-    s(X, by = prompt, k = 7),
+    s(X, prompt, bs = "fs", k = 8),
   data = vowels %>% mutate(prompt = as.factor(prompt)),
   fan_lines = c(15, 20)
 )
@@ -707,8 +707,8 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   geom_path(size = 2, alpha = 0.8) +
   annotate(
     "label",
-    x = c(30, 35, 20, -10, -19, 35, 10),
-    y = c(25, 17, 26, 12, -10, -3, 11),
+    x = c(30, 35, 20, -3, 5, 10, 0),
+    y = c(21, 12.5, 24, 15, 20, 11, 8.5),
     label = c("i", "y", "e", "o", "u", "a", "ɜ")
   ) +
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
