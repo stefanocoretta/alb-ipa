@@ -707,10 +707,16 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   geom_path(size = 2, alpha = 0.8) +
   annotate(
     "label",
-    x = c(30, 35, 20, -3, 5, 10, 0),
-    y = c(21, 12.5, 24, 15, 20, 11, 8.5),
-    label = c("i", "y", "e", "o", "u", "a", "ɜ")
+    x = c(10, 20, 0, 30, -3, 5, 35),
+    y = c(11, 24, 8.5, 21, 15, 20, 12.5),
+    label = c("a", "e", "ɜ", "i", "o", "u", "y"),
+    fill = c(get_pal("Hoiho"), "#490B0A"),
+    colour = c("white", "white", "black", "white", "white", "white", "white"),
+    size = 6,
+    label.r = unit(0.3, "lines"),
+    label.padding = unit(0.3, "lines")
   ) +
+  scale_color_manual(values = c(get_pal("Hoiho"), "#490B0A")) +
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
