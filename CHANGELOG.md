@@ -1,5 +1,12 @@
 # Data changelog
 
+## 2021-02-14
+
+### Added
+
+- EMU configuration options and utility functions in `.Rprofile`. 
+
+
 ## 2021-02-10
 
 ### Changed
