@@ -495,6 +495,13 @@
       "Repository": "CRAN",
       "Hash": "6154ec2223172bce8162d4153cda21f7"
     },
+    "ipa": {
+      "Package": "ipa",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a088dab8d8630acfe5dee20928321733"
+    },
     "isoband": {
       "Package": "isoband",
       "Version": "0.2.3",
