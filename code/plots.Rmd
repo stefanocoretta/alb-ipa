@@ -18,31 +18,59 @@ library(scales)
 library(rticulate)
 library(mgcv)
 library(Manu)
-
-revlog_trans <- function(base = exp(1)){
-    ## Define the desired transformation.
-    trans <- function(x){
-                 -log(x, base)
-                }
-    ## Define the reverse of the desired transformation
-    inv <- function(x){
-                 base^(-x)
-                }
-    ## Creates the transformation
-    trans_new(paste("revlog-", base, sep = ""),
-              trans, ## The transformation function (can be defined using anonymous functions)
-              inv,  ## The reverse of the transformation
-              log_breaks(base = base), ## default way to define the scale breaks
-              domain = c(1e-100, Inf) ## The domain over which the transformation is valued
-             )
-    }
 ```
+
+# Utility functions
+
+```{r functions}
+revlog_trans <- function(base = exp(1)) {
+  ## Define the desired transformation.
+  trans <- function(x) {
+    -log(x, base)
+  }
+  ## Define the reverse of the desired transformation
+  inv <- function(x) {
+    base ^ (-x)
+  }
+  ## Creates the transformation
+  trans_new(
+    paste("revlog-", base, sep = ""),
+    trans,
+    ## The transformation function (can be defined using anonymous functions)
+    inv,
+    ## The reverse of the transformation
+    log_breaks(base = base),
+    ## default way to define the scale breaks
+    domain = c(1e-100, Inf) ## The domain over which the transformation is valued
+  )
+}
+
+
+ipa_list <- list(
+  vowels_repl = list("@" = "\u025C"),
+  vowels = list(i = "i", y = "y", u = "u", e = "e", roe = "\u025C", o = "o", a = "a"),
+  cons_repl = list(
+    "g" = "\u261",
+    "D" = "\uF0", "T" = "\u3B8", "S" = "\u283", "Z" = "\u292",
+    "tS" = "t\u283", "dZ" = "d\u29", "c" = "t\u33B\u283\u33B", "J" = "d\u33B\u292\u33B"
+  ),
+  plos = list("p", "t", "k", "b", "d", "\u261"),
+  fric = list("f", "\u3B8", "s", "\u283", "h", "v", "\uF0", "z", "\u292"),
+  affr = list("ts", "t\u283", "t\u33B\u283\u33B", "dz", "d\u292", "d\u33B\u292\u33B")
+)
+ipa_list$cons <- c(ipa_list$plos, ipa_list$fric, ipa_list$affr)
+```
+
+# Read data
 
 ```{r read-data}
 # Formants
 
 formants <- readRDS("./data/dataframes/formants.rds") %>%
-  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a"))) %>%
+  mutate(
+    vowel = str_replace_all(vowel, unlist(ipa_list$vowels_repl)),
+    vowel = factor(vowel, levels = ipa_list$vowels)
+  ) %>%
   group_by(speaker) %>%
   mutate(
     F1.z = scale(F1),
@@ -55,12 +83,18 @@ formants <- readRDS("./data/dataframes/formants.rds") %>%
   )
 
 formants_all <- readRDS("./data/dataframes/formants_all.rds") %>%
-  mutate(vowel = factor(vowel, levels = c("i", "y", "u", "e", "@", "o", "a")))
+  mutate(
+    vowel = str_replace_all(vowel, unlist(ipa_list$vowels_repl)),
+    vowel = factor(vowel, levels = ipa_list$vowels)
+  )
 
 # VOT
 
 vot <- readRDS("./data/dataframes/vot.rds") %>%
-  mutate(consonant =  factor(consonant, levels = c("g", "d", "b", "k", "t", "p")))
+  mutate(
+    consonant = str_replace_all(consonant, unlist(ipa_list$cons_repl)),
+    consonant = factor(consonant, levels = c(ipa_list$plos, ipa_list$affr))
+  )
 
 # f0
 
@@ -81,7 +115,7 @@ fric_dft_l <- readRDS("./data/dataframes/fric_dtf_l.rds") %>%
 
 affr_dft_l <- readRDS("./data/dataframes/affr_dft_l.rds") %>%
   mutate(
-    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ")
+    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ̻")
   )
 
 dft_l <- bind_rows(fric_dft_l, affr_dft_l) %>%
@@ -90,7 +124,7 @@ dft_l <- bind_rows(fric_dft_l, affr_dft_l) %>%
       ipa,
       levels = c(
         "f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h",
-        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ"
+        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ̻"
       )
     )
   )
@@ -102,13 +136,13 @@ fric_moments <- readRDS("./data/dataframes/fric_moments.rds") %>%
 
 affr_moments <- readRDS("./data/dataframes/affr_moments.rds")  %>%
   mutate(
-    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ")
+    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ̻")
   )
 
 moments <- bind_rows(fric_moments, affr_moments) %>%
   mutate(
     ipa = factor(ipa,
-      levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h", "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ")
+      levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h", "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ̻")
     ),
     voicing = ifelse(ipa %in% c("f", "θ", "s", "ʃ", "ts", "tʃ", "t̻ʃ̻", "h"), "voiceless", "voiced"),
     voicing = factor(voicing, levels = c("voiceless", "voiced")),
@@ -117,7 +151,7 @@ moments <- bind_rows(fric_moments, affr_moments) %>%
       ipa %in% c("s", "z", "ts", "dz") ~ "alveolar",
       ipa %in% c("θ", "ð") ~ "dental",
       ipa %in% c("tʃ", "dʒ", "ʃ", "ʒ") ~ "apico-postalveolar",
-      ipa %in% c("t̻ʃ̻", "d̻ʒ") ~ "lamino-postalveolar",
+      ipa %in% c("t̻ʃ̻", "d̻ʒ̻") ~ "lamino-postalveolar",
       ipa %in% c("h") ~ "glottal"
     ),
     poa = factor(poa, levels = c("labial", "dental", "alveolar", "apico-postalveolar", "lamino-postalveolar", "glottal")),
@@ -205,6 +239,42 @@ formants %>%
 
 ggsave("./img/f1f2-z-hz.png", width = 7, height = 5)
 ```
+
+```{r all-z-hz}
+# all speakers together, z-scored
+centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
+  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+
+formants %>%
+  ggplot(aes(x = F2.z.hz - F1.z.hz, y = F1.z.hz, group = vowel)) +
+  scale_x_reverse(name = "F2 (norm Hz)", position = "top") +
+  scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
+  geom_point(aes(colour = vowel), alpha = 0.5) +
+  stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
+  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  theme(legend.position = "none") +
+  scale_color_manual(values = get_pal("Kea"))
+
+ggsave("./img/f1f2-z-hz-f2-f1.png", width = 7, height = 5)
+```
+
+```{r all-z-hz}
+# all speakers together, z-scored
+centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
+  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+
+formants %>%
+  mutate(F1.z.bk = bark(F1.z.hz), F2.z.bk = bark(F2.z.hz)) %>%
+  ggplot(aes(x = F2.z.bk, y = F1.z.bk, group = vowel)) +
+  scale_x_reverse(name = "F2 (norm Hz)", position = "top") +
+  scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
+  geom_point(aes(colour = vowel), alpha = 0.5) +
+  stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
+  # geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  theme(legend.position = "none") +
+  scale_color_manual(values = get_pal("Kea"))
+```
+
 
 ```{r all-z-hz-log}
 # all speakers together, z-scored
@@ -601,6 +671,29 @@ average_dft %>%
   ggplot(aes(x = freq, y = track_value, colour = ipa)) +
   geom_line() +
   facet_wrap(~ ipa, ncol = 3)
+```
+
+```{r spectra-cor}
+average_dft %>%
+  filter(freq < 8000, ipa %in% c("s", "ts", "ʃ", "tʃ", "t̻ʃ̻", "z", "dz", "ʒ", "dʒ", "d̻ʒ̻")) %>%
+  mutate(ipa = factor(ipa, levels = c("s", "ts", "ʃ", "tʃ", "t̻ʃ̻", "z", "dz", "ʒ", "dʒ", "d̻ʒ̻"))) %>%
+  ggplot(aes(x = freq/1000, y = track_value, colour = ipa)) +
+  geom_line(alpha = 0.4) +
+  geom_smooth(method = "gam") +
+  facet_wrap(~ ipa, nrow = 2) +
+  labs(x = "kHz", y = "dB")
+```
+
+```{r spectra-postalv}
+dft_l %>%
+  filter(freq < 8000, ipa %in% c("ʃ", "tʃ", "t̻ʃ̻", "ʒ", "dʒ", "d̻ʒ̻")) %>%
+  mutate(ipa = factor(ipa, levels = c("ʃ", "tʃ", "t̻ʃ̻", "ʒ", "dʒ", "d̻ʒ̻"))) %>%
+  ggplot(aes(x = freq/1000, y = track_value, colour = ipa)) +
+  geom_line(alpha = 0.1, aes(group = bundle)) +
+  geom_smooth(method = "gam") +
+  facet_wrap(~ ipa, nrow = 2) +
+  labs(x = "kHz", y = "dB") +
+  theme_minimal(base_family = "FreeSans", base_size = 14)
 ```
 
 ## Spectral moments

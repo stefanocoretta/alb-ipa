@@ -273,6 +273,13 @@
       "Repository": "CRAN",
       "Hash": "813fa8857aaa949b243e2e0b4abb8592"
     },
+    "data.tree": {
+      "Package": "data.tree",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c0ddced80c3f074cb39a7a781698f68a"
+    },
     "dbplyr": {
       "Package": "dbplyr",
       "Version": "2.1.0",
@@ -317,15 +324,10 @@
     },
     "emuR": {
       "Package": "emuR",
-      "Version": "2.1.1.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "IPS-LMU",
-      "RemoteRepo": "emuR",
-      "RemoteRef": "70a2f5a",
-      "RemoteSha": "70a2f5ac6619d120f22c827280e1a56c82f7600b",
-      "Hash": "2ad46c21fc72537e709b519f0b073f0c"
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "fa349b4520398122cc07287d1d62d23f"
     },
     "evaluate": {
       "Package": "evaluate",

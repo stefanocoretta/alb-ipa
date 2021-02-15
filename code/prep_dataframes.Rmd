@@ -11,164 +11,132 @@ library(wrassp)
 library(tidyverse)
 ```
 
-## Prepare emuDB
+# Prepare emuDB
 
 ```{r emudb}
-path <- "./data/alb-ipa_emuDB"
-path2 <- "./data/dataframes"
-db <- load_emuDB(path, verbose = TRUE)
+alb_ipa <- "./data/alb-ipa_emuDB"
+alb_int <- "./data/alb-ipa-int_emuDB"
+dataframes <- "./data/dataframes"
 
-db_int <- load_emuDB("./data/alb-ipa-int_emuDB", verbose = TRUE)
+alb_ipa_db <- load_emuDB(alb_ipa, verbose = TRUE)
+alb_ipa_sql <- alb_ipa_db$connection
+alb_ipa_items <- tbl(alb_ipa_sql, "items")
+alb_ipa_links <- tbl(alb_ipa_sql, "links") %>% select(-label)
+alb_ipa_labels <- tbl(alb_ipa_sql, "labels")
+
+alb_ipa_int <- load_emuDB(alb_int, verbose = TRUE)
 ```
+
+# Read participants metadata
+
+```{r participants}
+participants <- read_csv("./data/metadata/participants.csv") %>%
+  select(-notes)
+```
+
+# IPA list 
+
+```{r ipa-list}
+ipa_list <- list(
+  vowels_repl = list("@" = "\u025C"),
+  vowels = list(i = "i", y = "y", u = "u", e = "e", roe = "\u025C", o = "o", a = "a"),
+  cons_repl = list(
+    "g" = "\u261",
+    "D" = "\uF0", "T" = "\u3B8", "S" = "\u283", "Z" = "\u292",
+    "tS" = "t\u283", "dZ" = "d\u29", "c" = "t\u33B\u283\u33B", "J" = "d\u33B\u292\u33B"
+  ),
+  plos = list("p", "t", "k", "b", "d", "\u261"),
+  fric = list("f", "\u3B8", "s", "\u283", "h", "v", "\uF0", "z", "\u292"),
+  affr = list("ts", "t\u283", "t\u33B\u283\u33B", "dz", "d\u292", "d\u33B\u292\u33B")
+)
+ipa_list$cons <- c(ipa_list$plos, ipa_list$fric, ipa_list$affr)
+```
+
+# Prepare data
 
 ## Formants
 
 First, we query the emuDB to get the vowels in the relevant example words.
 
 ```{r vow}
-vow <- query(
-  db,
+vow <- alb_ipa_db %>%
+  # Get vowels from the vowel-words in the MAU level
+  query(
   "[MAU == p -> #MAU == e| i | y | u | @ | o | a]",
   bundlePattern = "[0-9]*-(peri|por|puro|pyk3|pik3|p3r|para)"
-)
-word <- requery_hier(db, vow, "ORT-MAU")
-vow$word <- word$labels
+) %>%
+  # Requery each vowel segment to get the word from the ORT-MAU level
+  bind_cols(
+    requery_hier(alb_ipa_db, ., "ORT-MAU") %>% select(labels) %>% rename(word = labels)
+  ) %>%
+  left_join(y = participants)
 ```
 
 Now we can get formants from the midpoint of the vowels.
 
 ```{r formants}
 formants <- get_trackdata(
-  db,
+  alb_ipa_db,
   seglist = vow,
+  # Get values from mid-point
   cut = 0.5,
   npoints = 1,
   ssffTrackName = "FORMANTS",
   resultType = "tibble"
-)
-formants <- formants[ , -which(names(formants) %in% c("T4", "T5"))]
-formants <- formants[ which(formants$session != "s03"), ]
-```
-
-We now clean, rearrange and save the tibble.
-
-```{r clean-formants}
-formants$gender <- recode(formants$session, "s01" = "F", "s02" = "M", "s04" = "F", "s05" = "M", "s06" = "M")
-
-formants <- formants %>%
+) %>%
   rename(
     F1 = T1,
     F2 = T2,
     F3 = T3,
-    vowel = labels,
     speaker = session
+  ) %>%
+  select(speaker, gender, labels, word, bundle, F1, F2, F3, start, end, sample_start, sample_end, times_orig) %>%
+  mutate(
+    vowel = str_replace_all(labels, unlist(ipa_list$vowels_repl)),
+    vowel = factor(vowel, levels = ipa_list$vowels)
+  ) %>%
+  group_by(speaker) %>%
+  mutate(
+    F1.z = scale(F1),
+    F2.z = scale(F2)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    F1.z.hz = (F1.z * sd(F1)) + mean(F1),
+    F2.z.hz = (F2.z * sd(F2)) + mean(F2)
   )
-
-formants <- formants[ , -which(names(formants) %in% c("sl_rowIdx", "db_uuid","session", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "times_rel", "times_norm"))]
-
-formants <- formants %>%
-  select(speaker, gender, vowel, word, bundle, F1, F2, F3, start, end, sample_start, sample_end, times_orig)
 ```
+
+We now save the tibble.
 
 ```{r save-formants}
-saveRDS(formants, file = file.path(path2, "formants.rds"))
-```
-
-## Formants from all vowels
-
-First, we query the emuDB to get the vowels in the relevant example words.
-
-```{r vow-all}
-vow_all <- query(
-  db,
-  "[MAU == p -> #MAU == e| i | y | u | @ | o | a]"
-)
-word <- requery_hier(db, vow_all, "ORT-MAU")
-vow_all$word <- word$labels
-```
-
-Now we can get formants from the midpoint of the vowels.
-
-```{r formants-all}
-formants_all <- get_trackdata(
-  db,
-  seglist = vow_all,
-  cut = 0.5,
-  npoints = 1,
-  ssffTrackName = "FORMANTS",
-  resultType = "tibble"
-)
-formants_all <- formants_all[ , -which(names(formants_all) %in% c("T4", "T5"))]
-formants_all <- formants_all[ which(formants_all$session != "s03"), ]
-```
-
-We now clean, rearrange and save the tibble.
-
-```{r clean-formants-all}
-formants_all$gender <- recode(formants_all$session, "s01" = "F", "s02" = "M", "s04" = "F", "s05" = "M", "s06" = "M")
-
-formants_all <- formants_all %>%
-  rename(
-    F1 = T1,
-    F2 = T2,
-    F3 = T3,
-    vowel = labels,
-    speaker = session
-  )
-
-formants_all <- formants_all[ , -which(names(formants_all) %in% c("sl_rowIdx", "db_uuid","session", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "times_rel", "times_norm"))]
-
-formants_all <- formants_all %>%
-  select(speaker, gender, vowel, word, bundle, F1, F2, F3, start, end, sample_start, sample_end, times_orig)
-```
-
-```{r save-formants-all}
-saveRDS(formants_all, file = file.path(path2, "formants_all.rds"))
+saveRDS(formants, here::here(dataframes, "formants.rds"))
 ```
 
 ## VOT
 
-Quesry the database for the releases.
-
-```{r rels}
-rels = query(db, "RELS =~ .*", calcTimes = T)
-word2 = requery_hier(db, rels, "ORT-MAU")
-rels$word = word2$labels
-voi = query(db, "VOI =~ .*", calcTimes = T)
-```
-
-Let's calculate VOT.
+Query the database for the releases.
 
 ```{r vot}
-rels$tomatch = paste(rels$session, rels$bundle)
-voi$tomatch = paste(voi$session, voi$bundle)
-m = match(as.character(rels$tomatch), as.character(voi$tomatch))
-vot = data.frame(rels, voicing = voi$start[m])
-vot$VOT = (vot$voicing - as.numeric(vot$start))
-vot$consonant = as.character(substr(vot$word, 1, 1))
+vot <- alb_ipa_items %>%
+  filter(level %in% c("RELS", "VOI")) %>%
+  mutate(times = sample_point/sample_rate) %>%
+  left_join(y = alb_ipa_links %>% rename(item_id = to_id)) %>%
+  left_join(y = alb_ipa_labels %>% rename(from_id = item_id)) %>%
+  select(session, bundle, level, times, label) %>%
+  pivot_wider(names_from = "level", values_from = "times") %>%
+  as_tibble() %>%
+  mutate(
+    vot = (VOI - RELS) * 1000,
+    consonant = str_replace_all(label, unlist(ipa_list$cons_repl)),
+    consonant = factor(consonant, levels = c(ipa_list$plos, ipa_list$affr))
+  ) %>%
+  rename(speaker = session)
 ```
 
-We now clean, rearrange, and save the tibble.
-
-```{r clean-vot}
-vot$gender <- recode(vot$session, "s01" = "F", "s02" = "M", "s04" = "F", "s05" = "M", "s06" = "M")
-
-vot <- vot %>%
-  rename(
-    release = start,
-    speaker = session
-  )
-
-vot = vot[ , -which(names(vot) %in% c("labels", "end", "db_uuid","session", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "tomatch", "sample_start", "sample_end"))]
-columns2 <- c("speaker", "gender", "consonant", "word", "bundle", "VOT", "release", "voicing")
-vot <- vot[, columns2]
-
-vot <- vot %>%
-  select(speaker, gender, consonant, word, bundle, VOT, release, voicing)
-```
 
 ```{r save-vot}
-saveRDS(vot, file = file.path(path2, "vot.rds"))
+saveRDS(vot, here::here(dataframes, "vot.rds"))
 ```
 
 ## F0
@@ -176,46 +144,29 @@ saveRDS(vot, file = file.path(path2, "vot.rds"))
 First, we query the emuDB to get the relevant sentences.
 
 ```{r vow-f0}
-pros <- query(db, "MAU !~ <p:>", bundlePattern = "[0-9]*-(broad*|polar*|narrow*)", calcTimes = TRUE)
-pross <- requery_hier(db, pros, "ORT-MAU")
-pros$word <- pross$labels
-pros <- pros[ which(pros$labels != ""), ]
-proso <- get_trackdata(db, seglist = pros, ssffTrackName = "F0")
-proso <- proso[ which(proso$session != "s03"), ]
+vow_f0 <- alb_ipa_db %>%
+  # Get vowels from the intonation-sentences in the MAU level
+  query(
+    "MAU !~ <p:>",
+    bundlePattern = "[0-9]*-(broad*|polar*|narrow*)"
+  ) %>%
+  # Requery each vowel segment to get the word from the ORT-MAU level
+  bind_cols(
+    requery_hier(alb_ipa_db, ., "ORT-MAU") %>% select(labels) %>% rename(word = labels)
+  )
 ```
 
-The we time normalise time per token.
-
-```{r norm}
-proso$token <- paste(proso$session, proso$bundle)
-proso <- proso %>%
+```{r f0}
+f0 <- alb_ipa_db %>%
+  get_trackdata(
+    vow_f0,
+    ssffTrackName = "F0"
+  ) %>%
+  unite("token", session, bundle, remove = FALSE) %>%
   group_by(token) %>%
   mutate(
     sentence_dur = max(end) - min(start),
-    norm_timepoint = ((times_orig - (min(start)))/sentence_dur)
-  )
-```
-
-We can add info for speaker and sentence
-
-```{r speaker-sentence}
-proso$gender <- recode(
-  proso$session,
-  "s01" = "F",
-  "s02" = "M",
-  "s04" = "F",
-  "s05" = "M",
-  "s06" = "M"
-)
-proso <- proso %>%
-  rename(
-    "f0" = "T1",
-    "segment" = "labels",
-    "speaker" = "session"
-  )
-
-proso <- proso %>%
-  mutate(
+    norm_timepoint = ((times_orig - (min(start)))/sentence_dur),
     sentence_type = factor(substring(bundle, 5)),
     sentence = recode(
       sentence_type,
@@ -223,51 +174,48 @@ proso <- proso %>%
       "narrow-focus" = "(b) Lena lau murin, jo lulen.",
       "polar-q" = "(c) A e lau Lena murin?",
       "narrow-focus-q" = "(d) Çfarë lau Lena?"
-      )
+    )
+  ) %>%
+  left_join(y = participants) %>%
+  rename(
+    "f0" = "T1",
+    "segment" = "labels",
+    "speaker" = "session"
   )
+
+f0 <- f0 %>%
+  left_join(
+    y = f0 %>%
+      select(speaker, sentence, token, sentence_type) %>%
+      unique() %>%
+      ungroup() %>%
+      mutate(number = 1) %>%
+      group_by(speaker, sentence_type) %>%
+      mutate(repetition = cumsum(number)) %>%
+      ungroup() %>%
+      select(speaker, sentence, token, repetition)
+  ) %>%
+  filter(
+    f0 != 0,
+    !(segment %in% c("tS", "f"))
+  ) %>%
+  select(speaker, gender, segment, word, sentence, sentence_type, repetition, f0, norm_timepoint, times_orig, sentence_dur, token)
 ```
 
-Now we add info on token repetition.
-
-```{r repet}
-repet <- proso %>%
-  select(speaker, sentence, token, sentence_type) %>%
-  unique() %>%
-  ungroup() %>%
-  mutate(number = 1) %>%
-  group_by(speaker, sentence_type) %>%
-  mutate(repetition = cumsum(number)) %>%
-  ungroup() %>%
-  select(speaker, sentence, token, repetition)
-
-proso <- proso %>%
-  left_join(y = repet)
-```
-
-We now remove 0s from voiced segments and information that is not needed.
-
-```{r clean}
-proso <- proso[!(proso$f0 == 0 & (proso$segment != "tS" & proso$segment != "f")),]
-
-proso <- proso[ , -which(names(proso) %in% c("sl_rowIdx", "db_uuid", "level", "attribute", "start_item_id", "end_item_id", "start_item_seq_idx", "end_item_seq_idx", "type", "sample_rate", "sample_start", "sample_end", "times_rel", "start", "end", "times_norm"))]
-
-columns <- c("speaker", "gender", "segment", "word", "sentence", "sentence_type", "repetition", "f0", "norm_timepoint", "times_orig", "sentence_dur", "token")
-proso <- proso[, columns]
-```
 
 And we now save the tibble.
 
 ```{r save-f0}
-saveRDS(proso, file = "./data/dataframes/f0.rds")
+saveRDS(f0, here::here(dataframes, "f0.rds"))
 ```
 
 ## Intonation
 
 ```{r syl-f0}
-syl <- query(db_int, "SYL =~ .*", calcTimes = T) %>%
+syl <- query(alb_int_db, "SYL =~ .*", calcTimes = T) %>%
   filter(labels != "<p:>")
 
-syl_f0 <- get_trackdata(db_int, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
+syl_f0 <- get_trackdata(alb_int_db, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
   group_by(session, bundle) %>%
   mutate(
     sentence_dur = max(end) - min(start),
@@ -304,8 +252,8 @@ syl <- syl %>%
 ```
 
 ```{r save-syl-f0}
-saveRDS(syl_f0, "./data/dataframes/syl_f0.rds")
-saveRDS(syl, "./data/dataframes/syl.rds")
+saveRDS(syl_f0, here::here(dataframes, "syl_f0.rds"))
+saveRDS(syl, here::here(dataframes, "syl.rds"))
 ```
 
 
@@ -316,7 +264,7 @@ saveRDS(syl, "./data/dataframes/syl.rds")
 ```{r fric}
 # Get query list
 fric_segs <- query(
-  db,
+  alb_ipa_db,
   "[MAU == f|v|T|D|s|z|S|Z|h]",
   bundlePattern = "[0-9]*-(fati|vata|that3|dhat3|salla|zalli|shava|zhaba|han3)"
 )
@@ -325,7 +273,7 @@ fric_segs <- query(
 ```{r fric-dft}
 # Get dft in wide format
 fric_dft <- get_trackdata(
-  db,
+  alb_ipa_db,
   seglist = fric_segs,
   ssffTrackName = "dft",
   resultType = "tibble",
@@ -359,13 +307,13 @@ saveRDS(fric_moments, file = "./data/dataframes/fric_moments.rds")
 ```{r affr}
 # Get query list
 affr_rels = query(
-  db,
+  alb_ipa_db,
   "RELS =~ .*",
   bundlePattern = "[0-9]*-(cica|xixa|5aji|xhaja|qava|gjaku)", 
   calcTimes = T)
 
 affr_segs = requery_hier(
-  db,
+  alb_ipa_db,
   affr_rels,
   level = 'MAU')
 
@@ -376,7 +324,7 @@ affr_segs$start = affr_rels$start
 ```{r affr-dft}
 # Get data in wide format
 affr_dft = get_trackdata(
-  db,
+  alb_ipa_db,
   seglist = affr_segs,
   ssffTrackName = "dft",
   resultType = "tibble",
@@ -410,9 +358,9 @@ saveRDS(affr_moments, file = "./data/dataframes/affr_moments.rds")
 
 ## Examples
 
-```{r pata}
+```{r pata, eval=F}
 pata <- query(
-  db,
+  alb_ipa_db,
   "[ORT-MAU == pata]",
   bundlePattern = "018-pata",
   sessionPattern = "s04"
@@ -421,9 +369,9 @@ pata <- query(
 export_seglistToTxtCollection(db, pata, "./data/varia/vot-example/")
 ```
 
-```{r qgj}
+```{r qgj, eval=FALSE}
 qgj <- query(
-  db,
+  alb_ipa_db,
   "[ORT-MAU == gjaku|qava]",
   bundlePattern = "(044|038).*",
   sessionPattern = "s04"
