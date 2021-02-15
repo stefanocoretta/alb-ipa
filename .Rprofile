@@ -35,10 +35,20 @@ options(emuR.emuWebApp.dir = ewa_dir)
 
 # Load the alb-ipa emuDB ----
 
-alb_ipa <- "./data/alb-ipa_emuDB/"
+alb_ipa <- "./data/alb-ipa_emuDB"
 
-cat(crayon::green("✓ Loading emuDB...\n"))
-albDB <- load_emuDB(alb_ipa)
+cat(crayon::green("✓ Loading alb-ipa_emuDB...\n"))
+alb_ipa_db <- load_emuDB(alb_ipa)
+
+
+
+
+# Load the alb-ipa-int emuDB ----
+
+alb_int <- "./data/alb-ipa-int_emuDB"
+
+cat(crayon::green("✓ Loading alb-ipa-int_emuDB...\n"))
+alb_int_db <- load_emuDB(alb_int)
 
 
 
@@ -70,5 +80,5 @@ write_config_json <- function() {
 # Function to serve the alb-ipa emuDB ----
 
 serve_albDB <- function() {
-  serve(albDB)
+  serve(alb_ipa_db)
 }
