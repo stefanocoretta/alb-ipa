@@ -1,0 +1,120 @@
+---
+title: "Configuration procedure of the emuDB"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+library(emuR)
+library(wrassp)
+library(speakr)
+library(tools)
+
+# utility function to run Praat
+source("https://raw.githubusercontent.com/IPS-LMU/The-EMU-SDMS-Manual/master/R/praat2AsspDataObj.R")
+```
+
+# Create emuDB
+
+To create an emuDB, we import the WebMAUS output files from `./data/recordings/derived/post-align/` into `./data/alb-ipa_emuDB/`.
+
+The WebMAUS output TextGrids contain the following tiers:
+
+- `ORT-MAU`: Written transcription.
+- `KAN-MAU`: MAUS word canonical phonetic transcription.
+- `MAU`: MAUS segment transcription.
+
+These will be converted to `SEGMENT` (time-based) levels with the same names in the emuDB.
+
+```{r tg-to-emu}
+convert_TextGridCollection(
+  "./data/recordings/derived/post-align/",
+  "alb-ipa",
+  "./data"
+)
+```
+
+# Load emuDB
+
+We load the newly created emuDB with `load_emuDB()`.
+An SQLite connection to the database is opened and linked in `db_handle`.
+
+```{r alb-ipa}
+path <- "./data/alb-ipa_emuDB"
+
+cat(crayon::yellow("\n\u2747 Checking emuDB cache...\n"))
+db_handle <- load_emuDB(path, verbose = TRUE)
+
+cat(crayon::green("\n\u2705 emuDB connection established!\n"))
+db_handle$connection
+```
+
+# emuDB configuration
+
+## Create hierarchical annotation
+
+The EMU-SDMS allows for the creation of a time-less hierarchical annotation based on link definitions between levels.
+The terminal nodes of the hierarchical annotation can be time-based levels, from which the times of the higher levels can be derived.
+Time-less levels in the EMU-SDMS are of type `ITEM`.
+
+`autobuild_linkFromTimes()` links a pair of time-based levels based on the intra-level time alignment of segment boundaries or events.
+With the following code, we link `ORT-MAU` to `KAN-MAU` and `KAN-MAU` to `MAU`.
+`ORT-MAU` and `KAN-MAU` are converted from `SEGMENT` (time-based) to `ITEM` (time-less) levels.
+
+```{r autobuild}
+autobuild_linkFromTimes(
+  db_handle,
+  superlevelName = "ORT-MAU",
+  sublevelName = "KAN-MAU",
+  newLinkDefType = "ONE_TO_MANY",
+  convertSuperlevel = TRUE,
+)
+
+autobuild_linkFromTimes(
+  db_handle,
+  superlevelName = "KAN-MAU",
+  sublevelName = "MAU",
+  newLinkDefType = "ONE_TO_MANY",
+  convertSuperlevel = TRUE,
+)
+```
+
+## Add levels and link definitions
+
+We add more levels used for annotation and create link definitions.
+
+The following levels are added:
+
+- `RELS` of type `EVENT`: time-point level for the annotation of stop-closure releases.
+- `VOI` of type `EVENT`: time-point level for the annotation of the onset of vocal fold vibration following the stop-closure release.
+- `SYL` of type `ITEM`: time-less level for the annotation of syllabic structure.
+- `MAU2` of type `SEGMENT`: copy of `MAU` for the annotation of syllabic structure.
+
+```{r add-levels}
+add_levelDefinition(db_handle, "RELS", "EVENT")
+add_levelDefinition(db_handle, "VOI", "EVENT")
+add_levelDefinition(db_handle, "SYL", "ITEM")
+```
+
+We can now create new link definitions:
+
+```{r add-link-defs}
+add_linkDefinition(db_handle, "ONE_TO_ONE", "MAU", "RELS")
+add_linkDefinition(db_handle, "ONE_TO_ONE", "MAU", "VOI")
+add_linkDefinition(db_handle, "ONE_TO_MANY", "KAN-MAU", "SYL")
+add_linkDefinition(db_handle, "ONE_TO_MANY", "SYL", "MAU2")
+```
+
+## Add track data
+
+```{r}
+wav_paths <- list.files(path, pattern = ".*wav$", recursive = T, full.names = T)
+
+for (fp in wav_paths) {
+  praatObj <- praat2AsspDataObj(fp, object = "formant")
+  newPath <- paste0(file_path_sans_ext(fp), ".praatFms")
+  write.AsspDataObj(praatObj, file = newPath)
+}
+```
+
