@@ -57,32 +57,6 @@ alb_int_db <- load_emuDB(alb_int)
 
 
 
-
-# emuDB configuration utilities ----
-#
-# The following functions can be used to manage the emuDB configuration with the
-# more human-readable yaml format. Alternatively, emuR functions can be used to
-# programmatically set configuration options.
-
-write_config_yml <- function() {
-  config <- jsonlite::read_json(file.path(alb_ipa, "alb-ipa_DBconfig.json"))
-  yaml::write_yaml(
-    config,
-    file.path(alb_ipa, "alb-ipa_DBconfig.yml")
-  )
-  cat(crayon::green("✓ Wrote emuDB config.yml!\n"))
-}
-
-write_config_json <- function() {
-  config <- yaml::read_yaml(file.path(alb_ipa, "alb-ipa_DBconfig.yml"))
-  config_json <- jsonlite::toJSON(config, auto_unbox = T, pretty = T)
-  readr::write_file(config_json, file.path(alb_ipa, "alb-ipa_DBconfig.json"))
-  cat(crayon::green("✓ Wrote emuDB config.json!\n"))
-}
-
-
-
-
 # Function to serve the alb-ipa emuDB ----
 
 serve_albDB <- function() {
