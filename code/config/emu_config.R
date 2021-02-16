@@ -1,12 +1,11 @@
 library(emuR)
 library(wrassp)
-library(PraatR) # devtools::install_github("usagi5886/PraatR")
+library(speakr)
 library(tools)
 
-path = "./data/alb-ipa_emuDB"
+path <- "./data/alb-ipa_emuDB"
 
-db_handle = load_emuDB(path, verbose = TRUE)
-# serve(db_handle)
+db_handle <- load_emuDB(path, verbose = TRUE)
 
 
 # Build hierarchical structure ----

@@ -2,3 +2,4 @@
 # the performance. Learn more at
 # https://dvc.org/doc/user-guide/dvcignore
 *.DS_Store
+data/recordings/derived/post-align

@@ -39,26 +39,13 @@ The intervals in `sent` contain the following labels according to the type of th
 
 The Praat script `code/get_postalign_chunks.praat` was then run to extract individual audio and TextGrid chunks which were later imported into the EMU database (see below).
 The output of this script is saved in `data/recordings/derived/post-align/`.
-This folder is ignored by the versioning systems, to avoid data duplication (these files live in `data/alb-ipa_emuDB`).
+This folder is ignored by dvc, to avoid data duplication (these files live in `data/alb-ipa_emuDB`).
 
 ## EMU database creation
 
-The post-alignment chunks in `data/recordings/derived/post-align/` were then imported into an [EMU-SDMS](http://ips-lmu.github.io/EMU.html) database in `data/alb-ipa_emuDB/`:
+The post-alignment chunks in `data/recordings/derived/post-align/` were then imported into an [EMU-SDMS](http://ips-lmu.github.io/EMU.html) database in `data/alb-ipa_emuDB/`.
 
-```r
-library(emuR)
-convert_TextGridCollection(
-  "./data/recordings/derived/post-align/",
-  "alb-ipa",
-  "./data/alb-ipa_emuDB/"
-)
-```
-
-The contents of the created `data/recordings/alb-ipa_emuDB/alb-ipa_emuDB/` were moved to `data/recordings/alb-ipa_emuDB/` (as of emuR 2.0.4 there is no straightforward way to create a DB in an already existing folder; rather, a new folder is created).
-
-## EMU database configuration
-
-The script `code/config/emu_config.R` holds the code use to configure the EMU database.
+The creation and configuration procedures are documented in `code/config/emu-config.Rmd`.
 
 This script builds the annotation hierarchy and adds level definitions and tracks.
 
