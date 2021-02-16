@@ -1,10 +1,25 @@
 # Data changelog
 
+
+## 2021-02-16
+
+### Added
+
+- Added `SYL` level for intonation.
+
+- Duplicated `MAU` level to `MAU2` so that we can link it to `SYL` without breaking existing links.
+
+- Added links `KAN-MAU ==> SYL` and `SYL ==> MAU2`.
+
+- Added `intonation` perspective with `MAUS2` as level canvas.
+
+
+
 ## 2021-02-14
 
 ### Added
 
-- EMU configuration options and utility functions in `.Rprofile`. 
+- EMU configuration options and utility functions in `.Rprofile`.
 
 
 ## 2021-02-10
