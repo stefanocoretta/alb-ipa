@@ -875,6 +875,13 @@
       "Repository": "CRAN",
       "Hash": "8d0918547149f72e78ae942ccd1fdbc7"
     },
+    "speakr": {
+      "Package": "speakr",
+      "Version": "3.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "01566a5264288308aa08bc2390071162"
+    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.5.3",
