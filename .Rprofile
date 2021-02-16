@@ -65,17 +65,18 @@ alb_int_db <- load_emuDB(alb_int)
 # programmatically set configuration options.
 
 write_config_yml <- function() {
-  config <- jsonlite::fromJSON(paste0(alb_ipa, "alb-ipa_DBconfig.json"))
+  config <- jsonlite::read_json(file.path(alb_ipa, "alb-ipa_DBconfig.json"))
   yaml::write_yaml(
     config,
-    paste0(alb_ipa, "alb-ipa_DBconfig.yml")
+    file.path(alb_ipa, "alb-ipa_DBconfig.yml")
   )
   cat(crayon::green("✓ Wrote emuDB config.yml!\n"))
 }
 
 write_config_json <- function() {
-  config <- yaml::read_yaml(paste0(alb_ipa, "alb-ipa_DBconfig.yml"))
-  jsonlite::write_json(config, paste0(alb_ipa, "alb-ipa_DBconfig.json"))
+  config <- yaml::read_yaml(file.path(alb_ipa, "alb-ipa_DBconfig.yml"))
+  config_json <- jsonlite::toJSON(config, auto_unbox = T, pretty = T)
+  readr::write_file(config_json, file.path(alb_ipa, "alb-ipa_DBconfig.json"))
   cat(crayon::green("✓ Wrote emuDB config.json!\n"))
 }
 
