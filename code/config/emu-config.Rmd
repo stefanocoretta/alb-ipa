@@ -1,6 +1,10 @@
 ---
 title: "Configuration procedure of the emuDB"
-output: html_document
+output: 
+  html_document: 
+    highlight: tango
+    theme: paper
+    number_sections: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -108,7 +112,7 @@ add_linkDefinition(db_handle, "ONE_TO_MANY", "SYL", "MAU2")
 
 ## Add track data
 
-```{r}
+```{r get-formants}
 wav_paths <- list.files(path, pattern = ".*wav$", recursive = T, full.names = T)
 
 for (fp in wav_paths) {
@@ -116,5 +120,32 @@ for (fp in wav_paths) {
   newPath <- paste0(file_path_sans_ext(fp), ".praatFms")
   write.AsspDataObj(praatObj, file = newPath)
 }
+
+add_ssffTrackDefinition(
+  db_handle,
+  name = "FORMANTS",
+  columnName = "fm",
+  fileExtension = "praatFms",
+  verbose = TRUE
+)
+```
+
+```{r get-f0}
+add_ssffTrackDefinition(
+  db_handle,
+  name = "F0",
+  columnName = "F0",
+  onTheFlyFunctionName = "ksvF0",
+  verbose = TRUE
+)
+```
+
+```{r get-dft}
+add_ssffTrackDefinition(
+  db,
+  name = "dft",
+  onTheFlyFunctionName = "dftSpectrum",
+  verbose = TRUE
+)
 ```
 
