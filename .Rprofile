@@ -48,15 +48,6 @@ alb_ipa_db <- load_emuDB(alb_ipa)
 
 
 
-# Load the alb-ipa-int emuDB ----
-
-alb_int <- "./data/alb-ipa-int_emuDB"
-
-cat(crayon::green("✓ Loading alb-ipa-int_emuDB...\n"))
-alb_int_db <- load_emuDB(alb_int)
-
-
-
 # Function to serve the alb-ipa emuDB ----
 
 serve_albDB <- function() {
