@@ -1,5 +1,10 @@
 # Data changelog
 
+## 2021-02-17
+
+### Added
+
+- Added `BUR` level for annotation of burst offset and linked to `MAU`.
 
 ## 2021-02-16
 
