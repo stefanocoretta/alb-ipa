@@ -97,6 +97,7 @@ The following levels are added:
 
 ```{r add-levels}
 add_levelDefinition(db_handle, "RELS", "EVENT")
+add_levelDefinition(db_handle, "BUR", "EVENT")
 add_levelDefinition(db_handle, "VOI", "EVENT")
 add_levelDefinition(db_handle, "SYL", "ITEM")
 ```
@@ -105,6 +106,7 @@ We can now create new link definitions:
 
 ```{r add-link-defs}
 add_linkDefinition(db_handle, "ONE_TO_ONE", "MAU", "RELS")
+add_linkDefinition(db_handle, "ONE_TO_ONE", "MAU", "BUR")
 add_linkDefinition(db_handle, "ONE_TO_ONE", "MAU", "VOI")
 add_linkDefinition(db_handle, "ONE_TO_MANY", "KAN-MAU", "SYL")
 add_linkDefinition(db_handle, "ONE_TO_MANY", "SYL", "MAU2")
