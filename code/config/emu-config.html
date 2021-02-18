@@ -327,13 +327,15 @@ summary {
 <li><code>MAU2</code> of type <code>SEGMENT</code>: copy of <code>MAU</code> for the annotation of syllabic structure.</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;RELS&quot;</span>, <span class="st">&quot;EVENT&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;VOI&quot;</span>, <span class="st">&quot;EVENT&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;SYL&quot;</span>, <span class="st">&quot;ITEM&quot;</span>)</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;BUR&quot;</span>, <span class="st">&quot;EVENT&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;VOI&quot;</span>, <span class="st">&quot;EVENT&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">add_levelDefinition</span>(db_handle, <span class="st">&quot;SYL&quot;</span>, <span class="st">&quot;ITEM&quot;</span>)</span></code></pre></div>
 <p>We can now create new link definitions:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_ONE&quot;</span>, <span class="st">&quot;MAU&quot;</span>, <span class="st">&quot;RELS&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_ONE&quot;</span>, <span class="st">&quot;MAU&quot;</span>, <span class="st">&quot;VOI&quot;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_MANY&quot;</span>, <span class="st">&quot;KAN-MAU&quot;</span>, <span class="st">&quot;SYL&quot;</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_MANY&quot;</span>, <span class="st">&quot;SYL&quot;</span>, <span class="st">&quot;MAU2&quot;</span>)</span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_ONE&quot;</span>, <span class="st">&quot;MAU&quot;</span>, <span class="st">&quot;BUR&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_ONE&quot;</span>, <span class="st">&quot;MAU&quot;</span>, <span class="st">&quot;VOI&quot;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_MANY&quot;</span>, <span class="st">&quot;KAN-MAU&quot;</span>, <span class="st">&quot;SYL&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">add_linkDefinition</span>(db_handle, <span class="st">&quot;ONE_TO_MANY&quot;</span>, <span class="st">&quot;SYL&quot;</span>, <span class="st">&quot;MAU2&quot;</span>)</span></code></pre></div>
 </div>
 <div id="add-track-data" class="section level2" number="3.3">
 <h2 number="3.3"><span class="header-section-number">3.3</span> Add track data</h2>
