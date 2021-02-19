@@ -9,13 +9,13 @@ knitr::opts_knit$set(root.dir = here::here())
 library(emuR)
 library(wrassp)
 library(tidyverse)
+library(rticulate)
 ```
 
 # Prepare emuDB
 
 ```{r emudb}
 alb_ipa <- "./data/alb-ipa_emuDB"
-alb_int <- "./data/alb-ipa-int_emuDB"
 dataframes <- "./data/dataframes"
 
 alb_ipa_db <- load_emuDB(alb_ipa, verbose = TRUE)
@@ -23,8 +23,6 @@ alb_ipa_sql <- alb_ipa_db$connection
 alb_ipa_items <- tbl(alb_ipa_sql, "items")
 alb_ipa_links <- tbl(alb_ipa_sql, "links") %>% select(-label)
 alb_ipa_labels <- tbl(alb_ipa_sql, "labels")
-
-alb_ipa_int <- load_emuDB(alb_int, verbose = TRUE)
 ```
 
 # Read participants metadata
@@ -38,16 +36,17 @@ participants <- read_csv("./data/metadata/participants.csv") %>%
 
 ```{r ipa-list}
 ipa_list <- list(
-  vowels_repl = list("@" = "\u025C"),
-  vowels = list(i = "i", y = "y", u = "u", e = "e", roe = "\u025C", o = "o", a = "a"),
+  vowels_repl = list("@" = "\u025C", "o" = "\u0254"),
+  vowels = list(i = "i", y = "y", u = "u", e = "e", roe = "\u025C", o = "\u0254", a = "a"),
   cons_repl = list(
     "g" = "\u261",
     "D" = "\uF0", "T" = "\u3B8", "S" = "\u283", "Z" = "\u292",
-    "tS" = "t\u283", "dZ" = "d\u29", "c" = "t\u33B\u283\u33B", "J" = "d\u33B\u292\u33B"
+    "tS" = "t\u283", "dZ" = "d\u29", "c" = "t\u33B\u283\u33B", "J\\\\" = "d\u33B\u292\u33B"
   ),
   plos = list("p", "t", "k", "b", "d", "\u261"),
   fric = list("f", "\u3B8", "s", "\u283", "h", "v", "\uF0", "z", "\u292"),
-  affr = list("ts", "t\u283", "t\u33B\u283\u33B", "dz", "d\u292", "d\u33B\u292\u33B")
+  affr = list("ts", "t\u283", "t\u33B\u283\u33B", "dz", "d\u292", "d\u33B\u292\u33B"),
+  places = list("labial", "dental", "alveolar", "apico-postalveolar", "lamino-postalveolar", "glottal")
 )
 ipa_list$cons <- c(ipa_list$plos, ipa_list$fric, ipa_list$affr)
 ```
@@ -67,7 +66,7 @@ vow <- alb_ipa_db %>%
 ) %>%
   # Requery each vowel segment to get the word from the ORT-MAU level
   bind_cols(
-    requery_hier(alb_ipa_db, ., "ORT-MAU") %>% select(labels) %>% rename(word = labels)
+    requery_hier(alb_ipa_db, ., "ORT-MAU", timeRefSegmentLevel = "MAU") %>% select(labels) %>% rename(word = labels)
   ) %>%
   left_join(y = participants)
 ```
@@ -103,7 +102,10 @@ formants <- get_trackdata(
   ungroup() %>%
   mutate(
     F1.z.hz = (F1.z * sd(F1)) + mean(F1),
-    F2.z.hz = (F2.z * sd(F2)) + mean(F2)
+    F2.z.hz = (F2.z * sd(F2)) + mean(F2),
+    F1.z.bark = bark(F1.z.hz),
+    F2.z.bark = bark(F2.z.hz),
+    F2_F1.z.hz = F2.z.hz - F1.z.hz
   )
 ```
 
@@ -152,7 +154,7 @@ vow_f0 <- alb_ipa_db %>%
   ) %>%
   # Requery each vowel segment to get the word from the ORT-MAU level
   bind_cols(
-    requery_hier(alb_ipa_db, ., "ORT-MAU") %>% select(labels) %>% rename(word = labels)
+    requery_hier(alb_ipa_db, ., "ORT-MAU", timeRefSegmentLevel = "MAU") %>% select(labels) %>% rename(word = labels)
   )
 ```
 
@@ -191,7 +193,7 @@ f0 <- f0 %>%
       ungroup() %>%
       mutate(number = 1) %>%
       group_by(speaker, sentence_type) %>%
-      mutate(repetition = cumsum(number)) %>%
+      mutate(repetition = as.factor(cumsum(number))) %>%
       ungroup() %>%
       select(speaker, sentence, token, repetition)
   ) %>%
@@ -212,14 +214,16 @@ saveRDS(f0, here::here(dataframes, "f0.rds"))
 ## Intonation
 
 ```{r syl-f0}
-syl <- query(alb_int_db, "SYL =~ .*", calcTimes = T) %>%
+syl <- query(alb_ipa_db, "SYL =~ .*", calcTimes = T) %>%
   filter(labels != "<p:>")
 
-syl_f0 <- get_trackdata(alb_int_db, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
+syl_f0 <- get_trackdata(alb_ipa_db, seglist = syl, ssffTrackName = "F0", cut = 0.5) %>%
   group_by(session, bundle) %>%
   mutate(
     sentence_dur = max(end) - min(start),
-    norm_timepoint = ((times_orig - (min(start)))/sentence_dur)
+    norm_timepoint = ((times_orig - (min(start)))/sentence_dur),
+    start_norm = (start - min(start)) / sentence_dur,
+    end_norm = (end - min(start)) / sentence_dur
   ) %>%
   rename(f0 = "T1", speaker = "session") %>%
   mutate(
@@ -233,132 +237,146 @@ syl_f0 <- get_trackdata(alb_int_db, seglist = syl, ssffTrackName = "F0", cut = 0
       )
   )
 syl_f0[syl_f0$labels == "çfar(ë)",]$f0 <- 250
-
-syl <- syl %>%
-  group_by(session, bundle) %>%
-  mutate(
-    sentence_duration = max(end) - min(start),
-    start_norm = (start - min(start)) / sentence_duration,
-    end_norm = (end - min(start)) / sentence_duration,
-    sentence_type = str_sub(bundle, 5),
-    sentence = recode(
-      sentence_type,
-      "broad-focus" = "(a) Lena lau murin.",
-      "narrow-focus" = "(b) Lena lau murin, jo lulen.",
-      "polar-q" = "(c) A e lau Lena murin?",
-      "narrow-focus-q" = "(d) Çfarë lau Lena?"
-      )
-  )
 ```
 
 ```{r save-syl-f0}
 saveRDS(syl_f0, here::here(dataframes, "syl_f0.rds"))
-saveRDS(syl, here::here(dataframes, "syl.rds"))
 ```
 
 
 ## Spectral moments (CoG)
 
-### Fricatives
-
-```{r fric}
-# Get query list
-fric_segs <- query(
-  alb_ipa_db,
-  "[MAU == f|v|T|D|s|z|S|Z|h]",
-  bundlePattern = "[0-9]*-(fati|vata|that3|dhat3|salla|zalli|shava|zhaba|han3)"
-)
-```
-
-```{r fric-dft}
-# Get dft in wide format
-fric_dft <- get_trackdata(
-  alb_ipa_db,
-  seglist = fric_segs,
-  ssffTrackName = "dft",
-  resultType = "tibble",
-  cut = 0.5
-)
-
-fric_dft_l <- convert_wideToLong(fric_dft, calcFreqs = T)
-```
-
-```{r fric-moments}
-# Get spectral moments
-fric_moments <- fric_dft_l %>%
-  filter(freq < 10000) %>%
-  group_by(labels, sl_rowIdx) %>%
-  do(data_frame(moments = moments(.$track_value,.$freq, minval = TRUE))) %>%
-  mutate(moment_num = paste0("moment_", 1:(table(sl_rowIdx)))) %>%
-  pivot_wider(names_from = "moment_num", values_from = "moments")
-
-fric_moments %>%
-  group_by(labels) %>%
-  summarise(mean = mean(moment_1), sd = sd(moment_1))
-```
-
-```{r save-fric-dft-moments}
-saveRDS(fric_dft_l, file = "./data/dataframes/fric_dtf_l.rds")
-saveRDS(fric_moments, file = "./data/dataframes/fric_moments.rds")
-```
-
-### Affricates
-
-```{r affr}
-# Get query list
+```{r affr-rels}
 affr_rels = query(
   alb_ipa_db,
   "RELS =~ .*",
   bundlePattern = "[0-9]*-(cica|xixa|5aji|xhaja|qava|gjaku)", 
-  calcTimes = T)
-
-affr_segs = requery_hier(
-  alb_ipa_db,
-  affr_rels,
-  level = 'MAU')
-
-# Replace start of segments with time of release
-affr_segs$start = affr_rels$start
+  calcTimes = T
+) %>%
+  select(start, session, bundle) %>%
+  rename(rel_start = start)
 ```
 
-```{r affr-dft}
-# Get data in wide format
-affr_dft = get_trackdata(
+
+```{r spect-segs}
+spectr_segs <- query(
   alb_ipa_db,
-  seglist = affr_segs,
+  "[MAU == <p:> -> #MAU == f|v|T|D|s|z|S|Z|h|c|dz|dZ|J\\|ts|tS]",
+  bundlePattern = "[0-9]*-"
+) %>%
+  filter(str_detect(bundle, "(narrow|story)", negate = T)) %>%
+  left_join(y = affr_rels) %>%
+  mutate(
+    start = case_when(
+      !is.na(rel_start) ~ rel_start,
+      TRUE ~ start
+    )
+  )
+```
+
+```{r spect-dft}
+# Get dft in wide format
+spect_dft <- get_trackdata(
+  alb_ipa_db,
+  seglist = spectr_segs,
   ssffTrackName = "dft",
   resultType = "tibble",
-  cut = 0.5)
+  cut = 0.5
+) %>%
+  mutate(
+    consonant = str_replace_all(labels, unlist(ipa_list$cons_repl)),
+    consonant = factor(consonant, levels = c(ipa_list$fric, ipa_list$affr))
+  )
 
-
-affr_dft_l = convert_wideToLong(affr_dft, calcFreqs = T)
+spect_dft_l <- convert_wideToLong(spect_dft, calcFreqs = T)
 ```
 
-```{r affr-moments}
+```{r spect-moments}
 # Get spectral moments
-affr_moments = affr_dft_l %>%
+spect_moments <- spect_dft_l %>%
   filter(freq < 10000) %>%
   group_by(labels, sl_rowIdx) %>%
   do(data_frame(moments = moments(.$track_value,.$freq, minval = TRUE))) %>%
   mutate(moment_num = paste0("moment_", 1:(table(sl_rowIdx)))) %>%
-  pivot_wider(names_from = "moment_num", values_from = "moments")
+  pivot_wider(names_from = "moment_num", values_from = "moments") %>%
+  mutate(
+    consonant = str_replace_all(labels, unlist(ipa_list$cons_repl)),
+    consonant = factor(consonant, levels = c(ipa_list$fric, ipa_list$affr)),
+    voicing = ifelse(
+      consonant %in% c("f", "θ", "s", "ʃ", "ts", "tʃ", "t\u33B\u283\u33B", "h"),
+      "voiceless",
+      "voiced"
+    ),
+    voicing = factor(voicing, levels = c("voiceless", "voiced")),
+    poa = case_when(
+      consonant %in% c("f", "v") ~ "labial",
+      consonant %in% c("s", "z", "ts", "dz") ~ "alveolar",
+      consonant %in% c("θ", "ð") ~ "dental",
+      consonant %in% c("tʃ", "dʒ", "ʃ", "ʒ") ~ "apico-postalveolar",
+      consonant %in% c("t\u33B\u283\u33B", "d\u33B\u292\u33B") ~ "lamino-postalveolar",
+      consonant %in% c("h") ~ "glottal"
+    ),
+    poa = factor(poa, levels = ipa_list$places),
+    manner = ifelse(
+      consonant %in% c("f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "h"),
+      "fricatives",
+      "affricates"
+    ),
+    manner = factor(manner, levels = c("fricatives", "affricates")),
+    voicing_manner = factor(
+      paste(voicing, manner),
+      levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates")
+    )
+  )
 
-affr_moments %>%
+spect_moments %>%
   group_by(labels) %>%
   summarise(mean = mean(moment_1), sd = sd(moment_1))
 ```
 
+```{r save-spect}
+saveRDS(spect_dft_l, file = "./data/dataframes/spect_dft_l.rds")
+saveRDS(spect_moments, file = "./data/dataframes/spect_moments.rds")
+```
 
-```{r save-affr-dft-moments}
-# save dataframes
-saveRDS(affr_dft_l, file = "./data/dataframes/affr_dft_l.rds")
-saveRDS(affr_moments, file = "./data/dataframes/affr_moments.rds")
+## UTI
+
+```{r uti}
+cols <- c(
+  "speaker",
+  "rec_date",
+  "time",
+  "prompt",
+  "label"
+)
+
+uti_laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  group_by(rec_date) %>%
+  mutate(
+    time_norm = (time - min(time)) / (max(time) - min(time)),
+    prompt = as.factor(prompt)
+  ) %>%
+  drop_na()
+
+uti_vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  drop_na()
+```
+
+```{r save-uti}
+saveRDS(uti_laterals, file = "./data/dataframes/uti-laterals.rds")
+saveRDS(uti_vowels, file = "./data/dataframes/uti-vowels.rds")
 ```
 
 
 ## Examples
 
-```{r pata, eval=F}
+```{r pata, eval=FALSE}
 pata <- query(
   alb_ipa_db,
   "[ORT-MAU == pata]",
