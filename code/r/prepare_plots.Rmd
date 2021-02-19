@@ -12,7 +12,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
-theme_set(theme_minimal(base_family = "Lato"))
+theme_set(theme_light(base_family = "DejaVu Sans", base_size = 14))
+library(tikzDevice)
 library(zoo)
 library(scales)
 library(rticulate)
@@ -101,13 +102,12 @@ formants %>%
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/emu/vowels-z.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z.svg", width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
-  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean)
 
 formants %>%
   ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
@@ -115,19 +115,17 @@ formants %>%
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Kea")) +
-  # geom_abline(slope = 1, intercept = 0) +
   annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz.svg", width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz-ipa}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2_F1.z.hz,F1.z.hz)~vowel, formants, mean) %>%
-  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+centroids <- aggregate(cbind(F2_F1.z.hz,F1.z.hz)~vowel, formants, mean)
 
 formants %>%
   ggplot(aes(x = F2_F1.z.hz, y = F1.z.hz, group = vowel)) +
@@ -135,18 +133,17 @@ formants %>%
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Kea")) +
   labs(title = "IPA-style vowel chart")
 
-ggsave("./img/emu/vowels-z-hz-ipa.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz-ipa.svg", width = 7, height = 5)
 ```
 
 ```{r vowels-z-bark}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z.bark, F1.z.bark)~vowel, formants, mean) %>%
-  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+centroids <- aggregate(cbind(F2.z.bark, F1.z.bark)~vowel, formants, mean)
 
 formants %>%
   ggplot(aes(x = F2.z.bark, y = F1.z.bark, group = vowel)) +
@@ -154,19 +151,18 @@ formants %>%
   scale_y_reverse(name = "F1 (norm Bark)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Kea")) +
-  geom_abline(slope = 1, intercept = 0)
+  annotate("polygon", x = c(9, 5, 5, 9), y = c(9, 5, 9, 9), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-bark.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-bark.svg", width = 7, height = 5)
 ```
 
 
 ```{r vowels-z-hz-log}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
-  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean)
 
 formants %>%
   ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
@@ -174,12 +170,12 @@ formants %>%
   scale_y_continuous(name = "F1 (norm Hz log)", position = "right", trans = revlog_trans(base = 2), breaks = seq(0, 3000, by = 250)) +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2) +
-  geom_abline(slope = 1, intercept = 0)
+  annotate("polygon", x = c(1250, 500, 500, 1250), y = c(1250, 500, 1250, 1250), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-log.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz-log.svg", width = 7, height = 5)
 ```
 
 
@@ -234,10 +230,9 @@ vot %>%
   labs(
     y = "VOT (ms)", x = element_blank()
   ) +
-  scale_color_manual(values = get_pal("Kaka")) +
-  theme_minimal(base_family = "FreeSans", base_size = 14)
+  scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/emu/vot-jitter.png", width = 7, height = 4)
+ggsave("./img/emu/vot-jitter.svg", width = 7, height = 4)
 ```
 
 # f0
@@ -428,10 +423,9 @@ f0 %>%
       axis.text.x = element_blank()
     ) +
     scale_color_manual(values = get_pal("Kaka")) +
-    coord_cartesian(clip = "off") +
-    theme(text = element_text(size = 16))
+    coord_cartesian(clip = "off")
 
-ggsave("./img/emu/intonation.png", width = 7, height = 7)
+ggsave("./img/emu/intonation.svg", width = 7, height = 7)
 ```
 
 ```{r int-all}
@@ -459,7 +453,7 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/emu/intonation-all.png", width = 14, height = 10)
+ggsave("./img/emu/intonation-all.svg", width = 14, height = 10)
 ```
 
 
@@ -497,8 +491,7 @@ dft_l %>%
   geom_line(alpha = 0.1, aes(group = bundle)) +
   geom_smooth(method = "gam") +
   facet_wrap(~ consonant, nrow = 2) +
-  labs(x = "kHz", y = "dB") +
-  theme_minimal(base_family = "FreeSans", base_size = 14)
+  labs(x = "kHz", y = "dB")
 ```
 
 ## Spectral moments
@@ -523,11 +516,10 @@ moments %>%
     x = element_blank(),
     y = "Centre of gravity (Hz)"
   ) +
-  theme_light() +
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Putangitangi"))
 
-ggsave("./img/emu/cog.png", width = 7, height = 5)
+ggsave("./img/emu/cog.svg", width = 7, height = 5)
 ```
 
 ```{r cog-means-sd}
@@ -546,7 +538,7 @@ uti_laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
   geom_path()
 
-ggsave("./img/emu/uti-laterals.png", width = 7, height = 5)
+ggsave("./img/emu/uti-laterals.svg", width = 7, height = 5)
 ```
 
 ```{r laterals-all}
@@ -560,7 +552,7 @@ uti_laterals %>%
   ) +
   scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/emu/uti-laterals-all.png", width = 7, height = 5)
+ggsave("./img/emu/uti-laterals-all.svg", width = 7, height = 5)
 ```
 
 ```{r laterals-gam, eval=FALSE}
@@ -587,7 +579,7 @@ uti_vowels %>%
     x = "back-to-front (mm)", y = "low-to-high (mm)"
   )
 
-ggsave("./img/emu/uti-vowels-all.png", width = 7, height = 5)
+ggsave("./img/emu/uti-vowels-all.svg", width = 7, height = 5)
 ```
 
 ```{r vowels-gam}
@@ -618,5 +610,5 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/emu/uti-vowels-gam.png", width = 7, height = 5)
+ggsave("./img/emu/uti-vowels-gam.svg", width = 7, height = 5)
 ```
