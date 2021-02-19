@@ -227,14 +227,16 @@ vot %>%
 
 ```{r vot-jitter}
 vot %>%
-  ggplot(aes(consonant, vot, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.25, size = 3.5, alpha = 0.9) +
+  ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker, shape = speaker)) +
+  geom_jitter(width = 0.25, size = 3.5, alpha = 0.7) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
   labs(
-    y = "VOT (ms)"
+    y = "VOT (ms)", x = element_blank()
   ) +
-  scale_color_manual(values = get_pal("Kaka"))
+  scale_color_manual(values = get_pal("Kaka")) +
+  theme_minimal(base_family = "FreeSans", base_size = 14)
+
 ggsave("./img/emu/vot-jitter.png", width = 7, height = 4)
 ```
 
