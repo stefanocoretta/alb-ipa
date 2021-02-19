@@ -2,4 +2,3 @@
     remote = ips
 ['remote "ips"']
     url = ssh://ssh.phonetik.uni-muenchen.de/vnbdata/dvc/alb-ipa-data
-    ask_password = true
