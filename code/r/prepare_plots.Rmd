@@ -44,153 +44,36 @@ revlog_trans <- function(base = exp(1)) {
     domain = c(1e-100, Inf) ## The domain over which the transformation is valued
   )
 }
-
-
-ipa_list <- list(
-  vowels_repl = list("@" = "\u025C"),
-  vowels = list(i = "i", y = "y", u = "u", e = "e", roe = "\u025C", o = "o", a = "a"),
-  cons_repl = list(
-    "g" = "\u261",
-    "D" = "\uF0", "T" = "\u3B8", "S" = "\u283", "Z" = "\u292",
-    "tS" = "t\u283", "dZ" = "d\u29", "c" = "t\u33B\u283\u33B", "J" = "d\u33B\u292\u33B"
-  ),
-  plos = list("p", "t", "k", "b", "d", "\u261"),
-  fric = list("f", "\u3B8", "s", "\u283", "h", "v", "\uF0", "z", "\u292"),
-  affr = list("ts", "t\u283", "t\u33B\u283\u33B", "dz", "d\u292", "d\u33B\u292\u33B")
-)
-ipa_list$cons <- c(ipa_list$plos, ipa_list$fric, ipa_list$affr)
 ```
 
 # Read data
 
 ```{r read-data}
 # Formants
-
-formants <- readRDS("./data/dataframes/formants.rds") %>%
-  mutate(
-    vowel = str_replace_all(vowel, unlist(ipa_list$vowels_repl)),
-    vowel = factor(vowel, levels = ipa_list$vowels)
-  ) %>%
-  group_by(speaker) %>%
-  mutate(
-    F1.z = scale(F1),
-    F2.z = scale(F2)
-  ) %>%
-  ungroup() %>%
-  mutate(
-    F1.z.hz = (F1.z * sd(F1)) + mean(F1),
-    F2.z.hz = (F2.z * sd(F2)) + mean(F2)
-  )
-# 
-# formants_all <- readRDS("./data/dataframes/formants_all.rds") %>%
-#   mutate(
-#     vowel = str_replace_all(vowel, unlist(ipa_list$vowels_repl)),
-#     vowel = factor(vowel, levels = ipa_list$vowels)
-#   )
+formants <- readRDS("./data/dataframes/formants.rds")
 
 # VOT
-
-vot <- readRDS("./data/dataframes/vot.rds") %>%
-  mutate(
-    consonant = str_replace_all(consonant, unlist(ipa_list$cons_repl)),
-    consonant = factor(consonant, levels = c(ipa_list$plos, ipa_list$affr))
-  )
+vot <- readRDS("./data/dataframes/vot.rds")
 
 # f0
-
-f0 <- readRDS("./data/dataframes/f0.rds") %>%
-  mutate(repetition = as.factor(repetition))
+f0 <- readRDS("./data/dataframes/f0.rds")
 
 # Intonation
-
-syl <- readRDS("./data/dataframes/syl.rds")
 syl_f0 <- readRDS("./data/dataframes/syl_f0.rds")
 
 # CoG
+dft_l <- readRDS("./data/dataframes/spect_dft_l.rds")
 
-fric_dft_l <- readRDS("./data/dataframes/fric_dtf_l.rds") %>%
-  mutate(
-    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ")
-  )
-
-affr_dft_l <- readRDS("./data/dataframes/affr_dft_l.rds") %>%
-  mutate(
-    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ̻")
-  )
-
-dft_l <- bind_rows(fric_dft_l, affr_dft_l) %>%
-  mutate(
-    ipa = factor(
-      ipa,
-      levels = c(
-        "f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h",
-        "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ̻"
-      )
-    )
-  )
-
-fric_moments <- readRDS("./data/dataframes/fric_moments.rds") %>%
-  mutate(
-    ipa = recode(labels, D = "ð", `T` = "θ", S = "ʃ", Z = "ʒ")
-  )
-
-affr_moments <- readRDS("./data/dataframes/affr_moments.rds")  %>%
-  mutate(
-    ipa = recode(labels, tS = "tʃ", dZ = "dʒ", c = "t̻ʃ̻", J = "d̻ʒ̻")
-  )
-
-moments <- bind_rows(fric_moments, affr_moments) %>%
-  mutate(
-    ipa = factor(ipa,
-      levels = c("f", "θ", "s", "ʃ", "v", "ð", "z", "ʒ", "h", "ts", "tʃ", "t̻ʃ̻", "dz", "dʒ", "d̻ʒ̻")
-    ),
-    voicing = ifelse(ipa %in% c("f", "θ", "s", "ʃ", "ts", "tʃ", "t̻ʃ̻", "h"), "voiceless", "voiced"),
-    voicing = factor(voicing, levels = c("voiceless", "voiced")),
-    poa = case_when(
-      ipa %in% c("f", "v") ~ "labial",
-      ipa %in% c("s", "z", "ts", "dz") ~ "alveolar",
-      ipa %in% c("θ", "ð") ~ "dental",
-      ipa %in% c("tʃ", "dʒ", "ʃ", "ʒ") ~ "apico-postalveolar",
-      ipa %in% c("t̻ʃ̻", "d̻ʒ̻") ~ "lamino-postalveolar",
-      ipa %in% c("h") ~ "glottal"
-    ),
-    poa = factor(poa, levels = c("labial", "dental", "alveolar", "apico-postalveolar", "lamino-postalveolar", "glottal")),
-    manner = ifelse(ipa %in% c("f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "h"), "fricatives", "affricates"),
-    manner = factor(manner, levels = c("fricatives", "affricates")),
-    voicing_manner = factor(paste(voicing, manner), levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))
-)
+moments <- readRDS("./data/dataframes/spect_moments.rds")
 
 # UTI
-
-cols <- c(
-  "speaker",
-  "rec_date",
-  "time",
-  "prompt",
-  "label"
-)
-
-laterals <- read_aaa("./data/ultrasound/laterals-splines.txt", column_names = cols) %>%
-  mutate(
-    id = as.numeric(as.factor(paste(rec_date, time)))
-  ) %>%
-  group_by(rec_date) %>%
-  mutate(
-    time_norm = (time - min(time)) / (max(time) - min(time)),
-    prompt = as.factor(prompt)
-  ) %>%
-  drop_na()
-
-vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = cols) %>%
-  mutate(
-    id = as.numeric(as.factor(paste(rec_date, time)))
-  ) %>%
-  drop_na()
+uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
+uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
 ```
 
 # Formants
 
-```{r all}
+```{r vowels}
 # all speakers together
 ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
   scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
@@ -204,10 +87,9 @@ ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
   stat_ellipse(type = "norm", size = 1)
 ```
 
-```{r all-z}
+```{r vowels-z}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z,F1.z)~vowel, formants, mean) %>%
-  mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
+centroids <- aggregate(cbind(F2.z,F1.z)~vowel, formants, mean)
 
 formants %>%
   ggplot(aes(x = F2.z, y = F1.z, group = vowel)) +
@@ -215,14 +97,14 @@ formants %>%
   scale_y_reverse(name = "F1 (z-scores)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/f1f2-z.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z.png", width = 7, height = 5)
 ```
 
-```{r all-z-hz}
+```{r vowels-z-hz}
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
   mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
@@ -235,48 +117,53 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea"))
+  scale_color_manual(values = get_pal("Kea")) +
+  # geom_abline(slope = 1, intercept = 0) +
+  annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
-ggsave("./img/f1f2-z-hz.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz.png", width = 7, height = 5)
 ```
 
-```{r all-z-hz}
+```{r vowels-z-hz-ipa}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
+centroids <- aggregate(cbind(F2_F1.z.hz,F1.z.hz)~vowel, formants, mean) %>%
   mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
 
 formants %>%
-  ggplot(aes(x = F2.z.hz - F1.z.hz, y = F1.z.hz, group = vowel)) +
+  ggplot(aes(x = F2_F1.z.hz, y = F1.z.hz, group = vowel)) +
   scale_x_reverse(name = "F2-F1 (norm Hz)", position = "top") +
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  # geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea"))
+  scale_color_manual(values = get_pal("Kea")) +
+  labs(title = "IPA-style vowel chart")
 
-ggsave("./img/f1f2-z-hz-f2-f1.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz-ipa.png", width = 7, height = 5)
 ```
 
-```{r all-z-hz}
+```{r vowels-z-bark}
 # all speakers together, z-scored
-centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
+centroids <- aggregate(cbind(F2.z.bark, F1.z.bark)~vowel, formants, mean) %>%
   mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
 
 formants %>%
-  mutate(F1.z.bk = bark(F1.z.hz), F2.z.bk = bark(F2.z.hz)) %>%
-  ggplot(aes(x = F2.z.bk, y = F1.z.bk, group = vowel)) +
-  scale_x_reverse(name = "F2 (norm Hz)", position = "top") +
-  scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
+  ggplot(aes(x = F2.z.bark, y = F1.z.bark, group = vowel)) +
+  scale_x_reverse(name = "F2 (norm Bark)", position = "top") +
+  scale_y_reverse(name = "F1 (norm Bark)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
-  # geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
+  geom_text(data = centroids, aes(V1, V2, label = ipa), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea"))
+  scale_color_manual(values = get_pal("Kea")) +
+  geom_abline(slope = 1, intercept = 0)
+
+ggsave("./img/emu/vowels-z-bark.png", width = 7, height = 5)
 ```
 
 
-```{r all-z-hz-log}
+```{r vowels-z-hz-log}
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean) %>%
   mutate(ipa = c("i", "ÿ", "u", "e", "ɜ", "ɔ", "ä"))
@@ -292,44 +179,9 @@ formants %>%
   scale_color_brewer(type = "qual", palette = 2) +
   geom_abline(slope = 1, intercept = 0)
 
-ggsave("./img/f1f2-z-hz-log.png", width = 7, height = 5)
+ggsave("./img/emu/vowels-z-hz-log.png", width = 7, height = 5)
 ```
 
-```{r males}
-# male speakers only
-formants %>%
-  filter(gender == "M") %>%
-  ggplot(aes(x = F2, y = F1, col = vowel)) +
-  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label = vowel), show.legend = FALSE) +
-  stat_ellipse(type = "t", size = 1)
-formants %>%
-  filter(gender == "M") %>%
-  ggplot(aes(x = F2, y = F1, col = vowel)) +
-  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label = vowel), show.legend = FALSE) +
-  stat_ellipse(type = "norm", size = 1)
-```
-
-```{r females}
-# female speakers only
-formants %>%
-  filter(gender == "F") %>%
-  ggplot(aes(x = F2, y = F1, col = vowel)) +
-  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label = vowel), show.legend = FALSE) +
-  stat_ellipse(type = "t", size = 1)
-formants %>%
-  filter(gender == "F") %>%
-  ggplot(aes(x = F2, y = F1, col = vowel)) +
-  scale_x_reverse(name = "F2 (Hz)", limits = c(3500, 0)) +
-  scale_y_reverse(name = "F1 (Hz)", limits = c(1500, 0)) +
-  geom_text(aes(label = vowel), show.legend = FALSE) +
-  stat_ellipse(type = "norm", size = 1)
-```
 
 ```{r all-facet}
 # male-female side by side
@@ -356,32 +208,10 @@ ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
   geom_text(aes(label = vowel), show.legend = FALSE)
 ```
 
-## All vowels
-
-```{r all-vowels-z}
-formants_all %>%
-  group_by(speaker) %>%
-  mutate(
-    F1_z = scale(F1),
-    F2_z = scale(F2)
-  ) %>%
-  filter(
-    F1_z < 2.5, F1_z > -2.5,
-    F2_z < 2.5, F2_z > -2.5
-  ) %>%
-  ggplot(aes(F2_z, F1_z, colour = vowel, label = vowel)) +
-  geom_point(alpha = 0.5) +
-  stat_ellipse(type = "t") +
-  scale_y_reverse() +
-  scale_x_reverse() +
-  coord_fixed()
-```
-
-
 # VOT
 
 ```{r vot-bar}
-ggplot(vot, aes(x = VOT, y = consonant)) +
+ggplot(vot, aes(x = vot, y = consonant)) +
   stat_summary(fun = mean, geom = "bar") +
   stat_summary(fun.data = mean_se,
                geom = "errorbar",
@@ -390,14 +220,14 @@ ggplot(vot, aes(x = VOT, y = consonant)) +
 
 ```{r vot-dist}
 vot %>%
-  ggplot(aes(VOT)) +
+  ggplot(aes(vot)) +
   geom_density() +
   facet_wrap(. ~ consonant) + geom_rug()
 ```
 
 ```{r vot-jitter}
 vot %>%
-  ggplot(aes(consonant, VOT, colour = speaker, shape = speaker)) +
+  ggplot(aes(consonant, vot, colour = speaker, shape = speaker)) +
   geom_jitter(width = 0.25, size = 3.5, alpha = 0.9) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
@@ -405,7 +235,7 @@ vot %>%
     y = "VOT (ms)"
   ) +
   scale_color_manual(values = get_pal("Kaka"))
-ggsave("./img/vot-jitter.png", width = 7, height = 4)
+ggsave("./img/emu/vot-jitter.png", width = 7, height = 4)
 ```
 
 # f0
@@ -578,11 +408,11 @@ f0 %>%
   ) %>%
   ggplot(aes(norm_timepoint, f0_smooth)) +
     geom_path(aes(colour = speaker), linetype = "31", size = 1) +
-    geom_text(data = syl_f0, aes(norm_timepoint, -50, label = labels), size = 4) +
-    geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
+    geom_text(data = syl_f0, aes(norm_timepoint, 50, label = labels), size = 4) +
+    geom_vline(data = syl_f0, aes(xintercept = start_norm), alpha = 0.5) +
     geom_vline(aes(xintercept = 1), alpha = 0.5) +
-    facet_wrap(. ~ sentence, ncol = 1) +
-    ylim(-100, 500) +
+    facet_wrap(. ~ sentence, ncol = 1, scales = "free_y") +
+    # ylim(-100, 500) +
     labs(
       title = "Smoothed f0 contours",
       caption = "Rolling mean filter, order = 21",
@@ -595,9 +425,11 @@ f0 %>%
       panel.grid.minor.y = element_blank(),
       axis.text.x = element_blank()
     ) +
-    scale_color_manual(values = get_pal("Kaka"))
+    scale_color_manual(values = get_pal("Kaka")) +
+    coord_cartesian(clip = "off") +
+    theme(text = element_text(size = 16))
 
-ggsave("./img/intonation.png", width = 7, height = 5)
+ggsave("./img/emu/intonation.png", width = 7, height = 7)
 ```
 
 ```{r int-all}
@@ -607,7 +439,7 @@ f0 %>%
   ggplot(aes(norm_timepoint, f0_smooth)) +
     geom_path(aes(colour = speaker, linetype = speaker), size = 0.7) +
     geom_text(data = syl_f0, aes(norm_timepoint, f0, label = labels), nudge_y = 55, size = 4) +
-    geom_vline(data = syl, aes(xintercept = start_norm), alpha = 0.5) +
+    geom_vline(data = syl_f0, aes(xintercept = start_norm), alpha = 0.5) +
     geom_vline(aes(xintercept = 1), alpha = 0.5) +
     facet_wrap(~ sentence, ncol = 1) +
     labs(
@@ -625,33 +457,7 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/intonation-all.png", width = 14, height = 10)
-```
-
-```{r int-decl}
-f0 %>%
-  filter(sentence == "Lena lau murin.") %>%
-  group_by(token) %>%
-  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
-  ggplot(aes(norm_timepoint, f0_smooth)) +
-    geom_path(aes(colour = speaker, linetype = repetition), size = 0.7) +
-    facet_wrap(~ speaker, ncol = 1, scales = "free") +
-    labs(
-      title = "Smoothed f0 contours",
-      caption = "Rolling mean filter, order = 21",
-      x = "normalised time",
-      y = "f0 (Hz)"
-    ) +
-    theme(
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor.x = element_blank(),
-      panel.grid.minor.y = element_blank(),
-      axis.text.x = element_blank()
-    ) +
-    scale_color_brewer(type = "qual") +
-    theme_dark()
-
-ggsave("./img/intonation-decl.png", width = 10, height = 14)
+ggsave("./img/emu/intonation-all.png", width = 14, height = 10)
 ```
 
 
@@ -661,37 +467,34 @@ ggsave("./img/intonation-decl.png", width = 10, height = 14)
 
 ```{r averaged-spectra}
 average_dft <- dft_l %>%
-  group_by(ipa, freq) %>%
+  group_by(consonant, freq) %>%
   summarise(track_value = mean(track_value), .groups = "drop")
 ```
 
 ```{r spectra}
 average_dft %>%
   filter(freq < 10000) %>%
-  ggplot(aes(x = freq, y = track_value, colour = ipa)) +
+  ggplot(aes(x = freq, y = track_value, colour = consonant)) +
   geom_line() +
-  facet_wrap(~ ipa, ncol = 3)
+  facet_wrap(~ consonant, ncol = 3)
 ```
 
 ```{r spectra-cor}
 average_dft %>%
-  filter(freq < 8000, ipa %in% c("s", "ts", "ʃ", "tʃ", "t̻ʃ̻", "z", "dz", "ʒ", "dʒ", "d̻ʒ̻")) %>%
-  mutate(ipa = factor(ipa, levels = c("s", "ts", "ʃ", "tʃ", "t̻ʃ̻", "z", "dz", "ʒ", "dʒ", "d̻ʒ̻"))) %>%
-  ggplot(aes(x = freq/1000, y = track_value, colour = ipa)) +
+  ggplot(aes(x = freq/1000, y = track_value, colour = consonant)) +
   geom_line(alpha = 0.4) +
   geom_smooth(method = "gam") +
-  facet_wrap(~ ipa, nrow = 2) +
+  facet_wrap(~ consonant, nrow = 2) +
   labs(x = "kHz", y = "dB")
 ```
 
 ```{r spectra-postalv}
 dft_l %>%
-  filter(freq < 8000, ipa %in% c("ʃ", "tʃ", "t̻ʃ̻", "ʒ", "dʒ", "d̻ʒ̻")) %>%
-  mutate(ipa = factor(ipa, levels = c("ʃ", "tʃ", "t̻ʃ̻", "ʒ", "dʒ", "d̻ʒ̻"))) %>%
-  ggplot(aes(x = freq/1000, y = track_value, colour = ipa)) +
+  filter(freq < 8000, consonant %in% c("ʃ", "tʃ", "t\u33B\u283\u33B", "ʒ", "dʒ", "d\u33B\u292\u33B")) %>%
+  ggplot(aes(x = freq/1000, y = track_value, colour = consonant)) +
   geom_line(alpha = 0.1, aes(group = bundle)) +
   geom_smooth(method = "gam") +
-  facet_wrap(~ ipa, nrow = 2) +
+  facet_wrap(~ consonant, nrow = 2) +
   labs(x = "kHz", y = "dB") +
   theme_minimal(base_family = "FreeSans", base_size = 14)
 ```
@@ -702,11 +505,11 @@ dft_l %>%
 moments %>%
   # add phantom voiceless glottal fricative
   bind_rows(tibble(labels = NA, sl_rowIdx = NA, moment_1 = NA, moment_2 = NA,
-      moment_3 = NA, moment_4 = NA, ipa = NA, voicing = NA, poa = NA,
+      moment_3 = NA, moment_4 = NA, consonant = NA, voicing = NA, poa = NA,
       manner = NA, voicing_manner = "voiced fricatives"
   )) %>%
   mutate(voicing_manner = factor(voicing_manner, levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))) %>%
-  ggplot(aes(ipa, moment_1)) +
+  ggplot(aes(consonant, moment_1)) +
   geom_jitter(
     aes(colour = poa), alpha = 0.7,
     position = position_jitter(width = 0.1, seed = 2534)
@@ -722,12 +525,12 @@ moments %>%
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Putangitangi"))
 
-ggsave("./img/cog.png", width = 7, height = 5)
+ggsave("./img/emu/cog.png", width = 7, height = 5)
 ```
 
 ```{r cog-means-sd}
 moments %>%
-  group_by(ipa) %>%
+  group_by(consonant) %>%
   summarise(mean = round(mean(moment_1), 0), sd = round(sd(moment_1), 0))
 ```
 
@@ -737,15 +540,15 @@ moments %>%
 ## Laterals
 
 ```{r lateral-splines-alpha}
-laterals %>%
+uti_laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
   geom_path()
 
-ggsave("./img/uti-laterals.png", width = 7, height = 5)
+ggsave("./img/emu/uti-laterals.png", width = 7, height = 5)
 ```
 
 ```{r laterals-all}
-laterals %>%
+uti_laterals %>%
   mutate(prompt = recode_factor(prompt, ala = "/l/", alla = "/ɫ/")) %>%
   ggplot(aes(X, Y, group = id, colour = prompt)) +
   geom_path(alpha = 0.7) +
@@ -755,14 +558,14 @@ laterals %>%
   ) +
   scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/uti-laterals-all.png", width = 7, height = 5)
+ggsave("./img/emu/uti-laterals-all.png", width = 7, height = 5)
 ```
 
 ```{r laterals-gam, eval=FALSE}
 laterals_gam <- polar_gam(
   Y ~
     s(X, by = prompt),
-  data = laterals %>% filter(fan_line > 5, fan_line < 40),
+  data = uti_laterals %>% filter(fan_line > 5, fan_line < 40),
   fan_lines = c(15, 20)
 )
 ```
@@ -774,7 +577,7 @@ plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
 ## Vowels
 
 ```{r vowels}
-vowels %>%
+uti_vowels %>%
   ggplot(aes(X, Y, group = id, colour = prompt, linetype = prompt)) +
   geom_path() +
   labs(
@@ -782,19 +585,19 @@ vowels %>%
     x = "back-to-front (mm)", y = "low-to-high (mm)"
   )
 
-ggsave("./img/uti-vowels-all.png", width = 7, height = 5)
+ggsave("./img/emu/uti-vowels-all.png", width = 7, height = 5)
 ```
 
-```{r vowels-gam, eval=FALSE}
+```{r vowels-gam}
 vowels_gam <- polar_gam(
   Y ~
     s(X, prompt, bs = "fs", k = 8),
-  data = vowels %>% mutate(prompt = as.factor(prompt)),
+  data = uti_vowels %>% mutate(prompt = as.factor(prompt)),
   fan_lines = c(15, 20)
 )
 ```
 
-```{r vowels-gam-plot, eval=FALSE}
+```{r vowels-gam-plot}
 predict_polar_gam(vowels_gam, length_out = 100) %>%
   ggplot(aes(X, Y, colour = prompt)) +
   geom_path(size = 2, alpha = 0.8) +
@@ -802,7 +605,7 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
     "label",
     x = c(10, 20, 0, 30, -3, 5, 35),
     y = c(11, 24, 8.5, 21, 15, 20, 12.5),
-    label = c("a", "e", "ɜ", "i", "o", "u", "y"),
+    label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
     fill = c(get_pal("Hoiho"), "#490B0A"),
     colour = c("white", "white", "black", "white", "white", "white", "white"),
     size = 6,
@@ -813,5 +616,5 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/uti-vowels-gam.png", width = 7, height = 5)
+ggsave("./img/emu/uti-vowels-gam.png", width = 7, height = 5)
 ```
