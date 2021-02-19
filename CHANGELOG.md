@@ -1,5 +1,17 @@
 # Data changelog
 
+## 2021-02-19
+
+### Added
+
+- Annotation of burst offset of /p b t d g/.
+
+### Changed
+
+- Directory structure of `code/` and `img/`.
+- Renamed files in `code/` and `img/`.
+- Refactored code in `prepare_data.Rmd` and `prepare_plots.Rmd`.
+
 ## 2021-02-17
 
 ### Added
