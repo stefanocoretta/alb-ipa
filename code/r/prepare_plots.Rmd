@@ -110,8 +110,6 @@ vowels_z <- formants %>%
 tikz("./img/emu/vowels-z.tex", width = 7, height = 5, standAlone = T)
 vowels_z
 dev.off()
-
-vowels_z
 ```
 
 ```{r vowels-z-hz}
@@ -132,8 +130,6 @@ vowels_z_hz <- formants %>%
 tikz("./img/emu/vowels-z-hz.tex", width = 7, height = 5, standAlone = T)
 vowels_z_hz
 dev.off()
-
-vowels_z_hz
 ```
 
 ```{r vowels-z-hz-ipa}
@@ -154,8 +150,6 @@ vowels_z_hz_ipa <- formants %>%
 tikz("./img/emu/vowels-z-hz-ipa.tex", width = 7, height = 5, standAlone = T)
 vowels_z_hz_ipa
 dev.off()
-
-vowels_z_hz_ipa
 ```
 
 ```{r vowels-z-bark}
@@ -176,8 +170,6 @@ vowels_z_hz_bark <- formants %>%
 tikz("./img/emu/vowels-z-hz-bark.tex", width = 7, height = 5, standAlone = T)
 vowels_z_hz_bark
 dev.off()
-
-vowels_z_hz_bark
 ```
 
 
@@ -199,8 +191,6 @@ vowels_z_hz_log <- formants %>%
 tikz("./img/emu/vowels-z-hz-log.tex", width = 7, height = 5, standAlone = T)
 vowels_z_hz_log
 dev.off()
-
-vowels_z_hz_log
 ```
 
 
@@ -260,8 +250,6 @@ vot_jitter <- vot %>%
 tikz("./img/emu/vot-jitter.tex", width = 7, height = 5, standAlone = T)
 vot_jitter
 dev.off()
-
-vot_jitter
 ```
 
 # f0
@@ -458,8 +446,6 @@ intonation <- f0 %>%
 tikz("./img/emu/intonation.tex", width = 7, height = 5, standAlone = T)
 intonation
 dev.off()
-
-intonation
 ```
 
 ```{r int-all}
@@ -490,8 +476,6 @@ intonation_all <- f0 %>%
 tikz("./img/emu/intonation-all.tex", width = 7, height = 5, standAlone = T)
 intonation_all
 dev.off()
-
-intonation_all
 ```
 
 
@@ -560,8 +544,6 @@ cog <- moments %>%
 tikz("./img/emu/cog.tex", width = 7, height = 5, standAlone = T)
 cog
 dev.off()
-
-cog
 ```
 
 ```{r cog-means-sd}
@@ -595,8 +577,6 @@ uti_lat_all <- uti_laterals %>%
 tikz("./img/emu/uti-laterals-all.tex", width = 7, height = 5, standAlone = T)
 uti_lat_all
 dev.off()
-
-uti_lat_all
 ```
 
 ```{r laterals-gam, eval=FALSE}
@@ -655,8 +635,17 @@ uti_vowel_gam <- predict_polar_gam(vowels_gam, length_out = 100) %>%
 tikz("./img/emu/uti-vowels-gam.tex", width = 7, height = 5, standAlone = T)
 uti_vowel_gam
 dev.off()
-
-uti_vowel_gam
 ```
 
+
+# Compile plots
+
+```{r compile-plots}
+plots <- list.files("./img/emu", "*.tex")
+
+for (i in plots) {
+  run_tex <- paste0("cd img/emu; xelatex -shell-escape ", i, "; rm *.aux *.log")
+  system(run_tex)
+}
+```
 
