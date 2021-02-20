@@ -91,6 +91,13 @@
       "Repository": "CRAN",
       "Hash": "dbb5e436998a7eba5a9d682060533338"
     },
+    "Unicode": {
+      "Package": "Unicode",
+      "Version": "13.0.0-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ee4aa2e9a8d57c66defe7bf70fd580cc"
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -944,6 +951,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "b227d13e29222b4574486cfcbde077fa"
+    },
+    "sysfonts": {
+      "Package": "sysfonts",
+      "Version": "0.8.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6a750650ae5e5ba11b45cb5012bd6167"
     },
     "systemfonts": {
       "Package": "systemfonts",

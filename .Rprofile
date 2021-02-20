@@ -53,3 +53,14 @@ alb_ipa_db <- load_emuDB(alb_ipa)
 serve_albDB <- function() {
   serve(alb_ipa_db)
 }
+
+
+
+
+# tikzDevice options ----
+
+options(tikzDefaultEngine = "xetex")
+options(tikzMetricsDictionary = "./data/varia/fontcache")
+options(tikzDocumentDeclaration = "\\documentclass[12pt,convert]{standalone}\n")
+options(tikzUnicodeMetricPackages = c("\\usetikzlibrary{calc}\n", "\\usepackage{fontspec,xunicode}\n"))
+options(tinytex.engine_args = "-shell-escape")
