@@ -12,8 +12,13 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
 library(tidyverse)
-theme_set(theme_light(base_family = "DejaVu Sans", base_size = 14))
+theme_set(theme_light())
 library(tikzDevice)
+options(tikzXelatexPackages = c(
+  getOption("tikzXelatexPackages"),
+  "\\setmainfont{DejaVu Sans}\n"
+  )
+)
 library(zoo)
 library(scales)
 library(rticulate)
@@ -92,7 +97,7 @@ ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z,F1.z)~vowel, formants, mean)
 
-formants %>%
+vowels_z <- formants %>%
   ggplot(aes(x = F2.z, y = F1.z, group = vowel)) +
   scale_x_reverse(name = "F2 (z-scores)", position = "top") +
   scale_y_reverse(name = "F1 (z-scores)", position = "right") +
@@ -102,14 +107,18 @@ formants %>%
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/emu/vowels-z.svg", width = 7, height = 5)
+tikz("./img/emu/vowels-z.tex", width = 7, height = 5, standAlone = T)
+vowels_z
+dev.off()
+
+vowels_z
 ```
 
 ```{r vowels-z-hz}
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean)
 
-formants %>%
+vowels_z_hz <- formants %>%
   ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
   scale_x_reverse(name = "F2 (norm Hz)", position = "top") +
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
@@ -120,14 +129,18 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz.svg", width = 7, height = 5)
+tikz("./img/emu/vowels-z-hz.tex", width = 7, height = 5, standAlone = T)
+vowels_z_hz
+dev.off()
+
+vowels_z_hz
 ```
 
 ```{r vowels-z-hz-ipa}
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2_F1.z.hz,F1.z.hz)~vowel, formants, mean)
 
-formants %>%
+vowels_z_hz_ipa <- formants %>%
   ggplot(aes(x = F2_F1.z.hz, y = F1.z.hz, group = vowel)) +
   scale_x_reverse(name = "F2-F1 (norm Hz)", position = "top") +
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
@@ -138,14 +151,18 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   labs(title = "IPA-style vowel chart")
 
-ggsave("./img/emu/vowels-z-hz-ipa.svg", width = 7, height = 5)
+tikz("./img/emu/vowels-z-hz-ipa.tex", width = 7, height = 5, standAlone = T)
+vowels_z_hz_ipa
+dev.off()
+
+vowels_z_hz_ipa
 ```
 
 ```{r vowels-z-bark}
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z.bark, F1.z.bark)~vowel, formants, mean)
 
-formants %>%
+vowels_z_hz_bark <- formants %>%
   ggplot(aes(x = F2.z.bark, y = F1.z.bark, group = vowel)) +
   scale_x_reverse(name = "F2 (norm Bark)", position = "top") +
   scale_y_reverse(name = "F1 (norm Bark)", position = "right") +
@@ -156,7 +173,11 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(9, 5, 5, 9), y = c(9, 5, 9, 9), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-bark.svg", width = 7, height = 5)
+tikz("./img/emu/vowels-z-hz-bark.tex", width = 7, height = 5, standAlone = T)
+vowels_z_hz_bark
+dev.off()
+
+vowels_z_hz_bark
 ```
 
 
@@ -164,7 +185,7 @@ ggsave("./img/emu/vowels-z-bark.svg", width = 7, height = 5)
 # all speakers together, z-scored
 centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean)
 
-formants %>%
+vowels_z_hz_log <- formants %>%
   ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
   scale_x_continuous(name = "F2 (norm Hz log)", position = "top", trans = revlog_trans(base = 2), breaks = seq(0, 3000, by = 250)) +
   scale_y_continuous(name = "F1 (norm Hz log)", position = "right", trans = revlog_trans(base = 2), breaks = seq(0, 3000, by = 250)) +
@@ -175,7 +196,11 @@ formants %>%
   scale_color_brewer(type = "qual", palette = 2) +
   annotate("polygon", x = c(1250, 500, 500, 1250), y = c(1250, 500, 1250, 1250), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-log.svg", width = 7, height = 5)
+tikz("./img/emu/vowels-z-hz-log.tex", width = 7, height = 5, standAlone = T)
+vowels_z_hz_log
+dev.off()
+
+vowels_z_hz_log
 ```
 
 
@@ -222,7 +247,7 @@ vot %>%
 ```
 
 ```{r vot-jitter}
-vot %>%
+vot_jitter <- vot %>%
   ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker, shape = speaker)) +
   geom_jitter(width = 0.25, size = 3.5, alpha = 0.7) +
   geom_hline(aes(yintercept = 0)) +
@@ -232,7 +257,11 @@ vot %>%
   ) +
   scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/emu/vot-jitter.svg", width = 7, height = 4)
+tikz("./img/emu/vot-jitter.tex", width = 7, height = 5, standAlone = T)
+vot_jitter
+dev.off()
+
+vot_jitter
 ```
 
 # f0
@@ -392,7 +421,7 @@ f0 %>%
 # Intonation
 
 ```{r int}
-f0 %>%
+intonation <- f0 %>%
   group_by(token) %>%
   mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
   filter(
@@ -416,6 +445,7 @@ f0 %>%
       x = "normalised time",
       y = "f0 (Hz)"
     ) +
+    theme_minimal() +
     theme(
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
@@ -425,11 +455,15 @@ f0 %>%
     scale_color_manual(values = get_pal("Kaka")) +
     coord_cartesian(clip = "off")
 
-ggsave("./img/emu/intonation.svg", width = 7, height = 7)
+tikz("./img/emu/intonation.tex", width = 7, height = 5, standAlone = T)
+intonation
+dev.off()
+
+intonation
 ```
 
 ```{r int-all}
-f0 %>%
+intonation_all <- f0 %>%
   group_by(token) %>%
   mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
   ggplot(aes(norm_timepoint, f0_smooth)) +
@@ -453,7 +487,11 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/emu/intonation-all.svg", width = 14, height = 10)
+tikz("./img/emu/intonation-all.tex", width = 7, height = 5, standAlone = T)
+intonation_all
+dev.off()
+
+intonation_all
 ```
 
 
@@ -497,7 +535,7 @@ dft_l %>%
 ## Spectral moments
 
 ```{r cog-plot}
-moments %>%
+cog <- moments %>%
   # add phantom voiceless glottal fricative
   bind_rows(tibble(labels = NA, sl_rowIdx = NA, moment_1 = NA, moment_2 = NA,
       moment_3 = NA, moment_4 = NA, consonant = NA, voicing = NA, poa = NA,
@@ -519,7 +557,11 @@ moments %>%
   theme(legend.position = "none") +
   scale_color_manual(values = get_pal("Putangitangi"))
 
-ggsave("./img/emu/cog.svg", width = 7, height = 5)
+tikz("./img/emu/cog.tex", width = 7, height = 5, standAlone = T)
+cog
+dev.off()
+
+cog
 ```
 
 ```{r cog-means-sd}
@@ -534,15 +576,13 @@ moments %>%
 ## Laterals
 
 ```{r lateral-splines-alpha}
-uti_laterals %>%
+uti_lat <- uti_laterals %>%
   ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
   geom_path()
-
-ggsave("./img/emu/uti-laterals.svg", width = 7, height = 5)
 ```
 
 ```{r laterals-all}
-uti_laterals %>%
+uti_lat_all <- uti_laterals %>%
   mutate(prompt = recode_factor(prompt, ala = "/l/", alla = "/ɫ/")) %>%
   ggplot(aes(X, Y, group = id, colour = prompt)) +
   geom_path(alpha = 0.7) +
@@ -552,7 +592,11 @@ uti_laterals %>%
   ) +
   scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/emu/uti-laterals-all.svg", width = 7, height = 5)
+tikz("./img/emu/uti-laterals-all.tex", width = 7, height = 5, standAlone = T)
+uti_lat_all
+dev.off()
+
+uti_lat_all
 ```
 
 ```{r laterals-gam, eval=FALSE}
@@ -578,8 +622,6 @@ uti_vowels %>%
     colour = "vowel", linetype = "vowel",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
   )
-
-ggsave("./img/emu/uti-vowels-all.svg", width = 7, height = 5)
 ```
 
 ```{r vowels-gam}
@@ -592,7 +634,7 @@ vowels_gam <- polar_gam(
 ```
 
 ```{r vowels-gam-plot}
-predict_polar_gam(vowels_gam, length_out = 100) %>%
+uti_vowel_gam <- predict_polar_gam(vowels_gam, length_out = 100) %>%
   ggplot(aes(X, Y, colour = prompt)) +
   geom_path(size = 2, alpha = 0.8) +
   annotate(
@@ -610,5 +652,11 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/emu/uti-vowels-gam.svg", width = 7, height = 5)
+tikz("./img/emu/uti-vowels-gam.tex", width = 7, height = 5, standAlone = T)
+uti_vowel_gam
+dev.off()
+
+uti_vowel_gam
 ```
+
+
