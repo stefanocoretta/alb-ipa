@@ -16,13 +16,6 @@
       "Repository": "CRAN",
       "Hash": "e4c04affc2cac20c8fec18385cd14691"
     },
-    "Cairo": {
-      "Package": "Cairo",
-      "Version": "1.5-12.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "5f09ea90a07218b11c6430b7ca71fee7"
-    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.1.1",
