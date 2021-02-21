@@ -381,10 +381,11 @@ pata <- query(
   alb_ipa_db,
   "[ORT-MAU == pata]",
   bundlePattern = "018-pata",
-  sessionPattern = "s04"
+  sessionPattern = "s04",
+  timeRefSegmentLevel = "MAU"
 )
 
-export_seglistToTxtCollection(db, pata, "./data/varia/vot-example/")
+export_seglistToTxtCollection(alb_ipa_db, pata, "./data/varia/vot-example/")
 ```
 
 ```{r qgj, eval=FALSE}
@@ -392,9 +393,10 @@ qgj <- query(
   alb_ipa_db,
   "[ORT-MAU == gjaku|qava]",
   bundlePattern = "(044|038).*",
-  sessionPattern = "s04"
+  sessionPattern = "s04",
+  timeRefSegmentLevel = "MAU"
 )
 
-export_seglistToTxtCollection(db, qgj, "./data/varia/qgj-example/")
+export_seglistToTxtCollection(alb_ipa_db, qgj, "./data/varia/qgj-example/")
 ```
 
