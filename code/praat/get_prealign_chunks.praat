@@ -29,8 +29,8 @@
 # SOFTWARE.
 ######################################
 
-raw_dir$ = "../data/recordings/raw"
-align_dir$ = "../data/recordings/derived/align"
+raw_dir$ = "../../data/recordings/raw"
+align_dir$ = "../../data/recordings/derived/align"
 Create Strings as file list: "file_list", "'raw_dir$'/*_mono.TextGrid"
 files = Get number of strings
 
