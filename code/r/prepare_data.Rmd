@@ -388,17 +388,31 @@ saveRDS(uti_vowels_2, file = "./data/dataframes/uti-vowels-2.rds")
 # Illustrative recordings
 
 ```{r illustr}
-if (!dir.exists("./data/recordings/derived/illustr/alb-ipa_txt_col_from_seglist")) {
+seglist_out <- "./data/recordings/derived/illustr/alb-ipa_txt_col_from_seglist"
+
+if (!dir.exists(seglist_out)) {
  s04_words <- query(
-  alb_ipa_db,
-  "ORT-MAU =~ .*",
-  sessionPattern = "s04",
-  timeRefSegmentLevel = "MAU"
-) %>%
+    alb_ipa_db,
+    "ORT-MAU =~ .*",
+    sessionPattern = "s04",
+    timeRefSegmentLevel = "MAU"
+  ) %>%
   mutate(id = as.numeric(str_sub(bundle, 1, 3))) %>%
   filter(labels != "", id < 126)
 
-export_seglistToTxtCollection(alb_ipa_db, s04_words, "./data/recordings/derived/illustr/") 
+  export_seglistToTxtCollection(alb_ipa_db, s04_words, "./data/recordings/derived/illustr/")
+
+  seglist <- read_csv(paste0(seglist_out, "/seglist.csv")) %>%
+    mutate(number = 1) %>%
+    group_by(labels) %>%
+    mutate(
+      repetition = as.factor(cumsum(number)),
+      file_name = str_glue("{bundle}-{repetition}.wav")
+    )
+  
+  wavs <- list.files(seglist_out, "*.wav")
+  
+  file.rename(paste0(seglist_out, "/", wavs), paste0(seglist_out, "/", seglist$file_name))
 }
 ```
 
