@@ -14,6 +14,7 @@ knitr::opts_knit$set(root.dir = here::here())
 library(svglite)
 library(tidyverse)
 theme_set(theme_light(base_family = "DejaVu Sans"))
+update_geom_defaults("text", list(family = theme_get()$text$family))
 library(zoo)
 library(scales)
 library(rticulate)
@@ -70,7 +71,7 @@ moments <- readRDS("./data/dataframes/spect_moments.rds")
 # UTI
 uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
 uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
-uti_vows <- readRDS("./data/dataframes/uti-vows.rds")
+uti_vowels_2 <- readRDS("./data/dataframes/uti-vowels-2.rds")
 ```
 
 # Formants
@@ -103,7 +104,7 @@ formants %>%
   theme(legend.position = "none") +
   scale_color_brewer(type = "qual", palette = 2)
 
-ggsave("./img/emu/vowels-z.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/vowels-z.png", width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz}
@@ -121,7 +122,7 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/vowels-z-hz.png", width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz-ipa}
@@ -139,7 +140,7 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   labs(title = "IPA-style vowel chart")
 
-ggsave("./img/emu/vowels-z-hz-ipa.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/vowels-z-hz-ipa.png", width = 7, height = 5)
 ```
 
 ```{r vowels-z-bark}
@@ -157,7 +158,7 @@ formants %>%
   scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(9, 5, 5, 9), y = c(9, 5, 9, 9), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-bark.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/vowels-z-hz-bark.png", width = 7, height = 5)
 ```
 
 
@@ -176,7 +177,7 @@ formants %>%
   scale_color_brewer(type = "qual", palette = 2) +
   annotate("polygon", x = c(1250, 500, 500, 1250), y = c(1250, 500, 1250, 1250), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-log.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/vowels-z-hz-log.png", width = 7, height = 5)
 ```
 
 
@@ -426,7 +427,7 @@ f0 %>%
     scale_color_manual(values = get_pal("Kaka")) +
     coord_cartesian(clip = "off")
 
-ggsave("./img/emu/intonation.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/intonation.png", width = 7, height = 5)
 ```
 
 ```{r int-all}
@@ -453,7 +454,7 @@ f0 %>%
     ) +
     scale_color_brewer(type = "qual")
 
-ggsave("./img/emu/intonation-all.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/intonation-all.png", width = 7, height = 5)
 ```
 
 
@@ -550,7 +551,7 @@ uti_laterals %>%
   ) +
   scale_color_manual(values = get_pal("Kaka"))
 
-ggsave("./img/emu/uti-laterals-all.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/uti-laterals-all.png", width = 7, height = 5)
 ```
 
 ```{r laterals-gam, eval=FALSE}
@@ -606,25 +607,25 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/emu/uti-vowels-gam.svg", width = 7, height = 5, device = svglite)
+ggsave("./img/emu/uti-vowels-gam.png", width = 7, height = 5)
 ```
 
-```{r vows-gam}
-vows_gam <- polar_gam(
+```{r vowels-gam-2}
+vowels_gam_2 <- polar_gam(
   Y ~
     s(X, prompt, bs = "fs", k = 8),
-  data = uti_vows %>% mutate(prompt = as.factor(prompt)),
+  data = uti_vowels_2 %>% mutate(prompt = as.factor(prompt)),
   fan_lines = c(15, 20)
 )
 ```
 
-```{r}
-predict_polar_gam(vows_gam, length_out = 100) %>%
-  ggplot(aes(Y, X, colour = prompt)) +
+```{r vowels-gam-2-plot}
+predict_polar_gam(vowels_gam_2, length_out = 100) %>%
+  ggplot(aes(X, Y, colour = prompt)) +
   geom_path(size = 2, alpha = 0.8) +
   annotate(
     "label",
-    x = c(10, 10, -5, 30, -4, 1, 35),
+    x = c(10, 15, -5, 30, -4, 1, 35),
     y = c(9, 24, 5, 20, 15, 20, 7),
     label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
     fill = c(get_pal("Hoiho"), "#490B0A"),
@@ -636,12 +637,14 @@ predict_polar_gam(vows_gam, length_out = 100) %>%
   scale_color_manual(values = c(get_pal("Hoiho"), "#490B0A")) +
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
+
+ggsave("./img/emu/uti-vowels-gam-2.png", width = 7, height = 5)
 ```
 
 
 # Convert svg
 
-```{r}
+```{r convert}
 plots <- list.files("./img/emu", "*.svg", full.names = T)
 
 for (plo in plots) {
