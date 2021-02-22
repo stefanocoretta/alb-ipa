@@ -366,11 +366,18 @@ uti_vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = co
     id = as.numeric(as.factor(paste(rec_date, time)))
   ) %>%
   drop_na()
+
+uti_vows <- read_aaa("./data/ultrasound/vows.txt", column_names = cols) %>%
+  mutate(
+    id = as.numeric(as.factor(paste(rec_date, time)))
+  ) %>%
+  drop_na()
 ```
 
 ```{r save-uti}
 saveRDS(uti_laterals, file = "./data/dataframes/uti-laterals.rds")
 saveRDS(uti_vowels, file = "./data/dataframes/uti-vowels.rds")
+saveRDS(uti_vows, file = "./data/dataframes/uti-vows.rds")
 ```
 
 
