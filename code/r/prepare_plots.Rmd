@@ -70,6 +70,7 @@ moments <- readRDS("./data/dataframes/spect_moments.rds")
 # UTI
 uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
 uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
+uti_vows <- readRDS("./data/dataframes/uti-vows.rds")
 ```
 
 # Formants
@@ -608,6 +609,34 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
 ggsave("./img/emu/uti-vowels-gam.svg", width = 7, height = 5, device = svglite)
 ```
 
+```{r vows-gam}
+vows_gam <- polar_gam(
+  Y ~
+    s(X, prompt, bs = "fs", k = 8),
+  data = uti_vows %>% mutate(prompt = as.factor(prompt)),
+  fan_lines = c(15, 20)
+)
+```
+
+```{r}
+predict_polar_gam(vows_gam, length_out = 100) %>%
+  ggplot(aes(Y, X, colour = prompt)) +
+  geom_path(size = 2, alpha = 0.8) +
+  annotate(
+    "label",
+    x = c(10, 10, -5, 30, -4, 1, 35),
+    y = c(9, 24, 5, 20, 15, 20, 7),
+    label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
+    fill = c(get_pal("Hoiho"), "#490B0A"),
+    colour = c("white", "white", "black", "white", "white", "white", "white"),
+    size = 6,
+    label.r = unit(0.3, "lines"),
+    label.padding = unit(0.3, "lines")
+  ) +
+  scale_color_manual(values = c(get_pal("Hoiho"), "#490B0A")) +
+  labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
+  theme(legend.position = "none")
+```
 
 
 # Convert svg
