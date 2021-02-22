@@ -10,6 +10,7 @@ library(emuR)
 library(wrassp)
 library(tidyverse)
 library(rticulate)
+library(tuneR)
 ```
 
 # Prepare emuDB
@@ -407,12 +408,32 @@ if (!dir.exists(seglist_out)) {
     group_by(labels) %>%
     mutate(
       repetition = as.factor(cumsum(number)),
-      file_name = str_glue("{bundle}-{repetition}.wav")
+      word = str_sub(bundle, 5),
+      file_name = str_glue("{word}-{repetition}.wav")
     )
   
+  words <- unique(seglist$word)
   wavs <- list.files(seglist_out, "*.wav")
   
   file.rename(paste0(seglist_out, "/", wavs), paste0(seglist_out, "/", seglist$file_name))
+  
+  sil <- silence(0.8, xunit = "time", bit = 16, pcm = T)
+  
+  dir.create(str_glue("{seglist_out}/words"), showWarnings = F)
+  
+  for (word in words) {
+    firstw <- readWave(str_glue("{seglist_out}/{word}-1.wav"))
+    secondw <- readWave(str_glue("{seglist_out}/{word}-2.wav"))
+    thirdf <- str_glue("{seglist_out}/{word}-3.wav")
+    if (file.exists(thirdf)) {
+      thirdw <- readWave(thirdf)
+    } else {
+      thirdw <- silence(0.001, xunit = "time", bit = 16, pcm = T)
+    }
+    
+    combined <- bind(sil, firstw, sil, secondw, sil, thirdw, sil)
+    writeWave(combined, str_glue("{seglist_out}/words/{word}.wav"))
+  }
 }
 ```
 
