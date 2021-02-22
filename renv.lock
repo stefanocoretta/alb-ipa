@@ -889,6 +889,13 @@
       "Repository": "CRAN",
       "Hash": "6e3b6ae7fe02b5859e4bb277f218b8ae"
     },
+    "signal": {
+      "Package": "signal",
+      "Version": "0.7-6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9ce2cf8e4f6e69f3308a668da5d665e6"
+    },
     "sourcetools": {
       "Package": "sourcetools",
       "Version": "0.1.7",
@@ -1007,6 +1014,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "f0b0ba735febac9a8344253ae6fa93f5"
+    },
+    "tuneR": {
+      "Package": "tuneR",
+      "Version": "1.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5bbc623279d70ff9bfa18045bb1411c5"
     },
     "usethis": {
       "Package": "usethis",
