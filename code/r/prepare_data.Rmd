@@ -374,29 +374,19 @@ saveRDS(uti_vowels, file = "./data/dataframes/uti-vowels.rds")
 ```
 
 
-## Examples
+# Illustrative recordings
 
 ```{r pata, eval=FALSE}
-pata <- query(
+s04_words <- query(
   alb_ipa_db,
-  "[ORT-MAU == pata]",
-  bundlePattern = "018-pata",
+  "ORT-MAU =~ .*",
   sessionPattern = "s04",
   timeRefSegmentLevel = "MAU"
-)
+) %>%
+  mutate(id = as.numeric(str_sub(bundle, 1, 3))) %>%
+  filter(labels != "", id < 126)
 
-export_seglistToTxtCollection(alb_ipa_db, pata, "./data/varia/vot-example/")
+export_seglistToTxtCollection(alb_ipa_db, s04_words, "./data/recordings/derived/illustr/")
 ```
 
-```{r qgj, eval=FALSE}
-qgj <- query(
-  alb_ipa_db,
-  "[ORT-MAU == gjaku|qava]",
-  bundlePattern = "(044|038).*",
-  sessionPattern = "s04",
-  timeRefSegmentLevel = "MAU"
-)
-
-export_seglistToTxtCollection(alb_ipa_db, qgj, "./data/varia/qgj-example/")
-```
 
