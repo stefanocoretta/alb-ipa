@@ -58,7 +58,7 @@ img_dir <- here("img")
 acou_dir <- here(img_dir, "acoustics")
 dir.create(acou_dir, showWarnings = F)
 arti_dir <- here(img_dir, "articulation")
-dir.create(arti_dir)
+dir.create(arti_dir, showWarnings = F)
 ```
 
 # Read data
@@ -663,12 +663,14 @@ ggsave(here(arti_dir, "uti-vowels-gam-2.png"), width = 7, height = 5)
 # Convert svg
 
 ```{r convert}
-plots <- list.files(acou_dir, "*.svg", full.names = T)
+if (system("which rsvg-convert", ignore.stdout = T) == 0) {
+ plots <- list.files(acou_dir, "*.svg", full.names = T)
 
-for (plo in plots) {
-  plo_name <- str_remove(plo, ".svg")
-  run_rsvg <- paste0("rsvg-convert -d 600 -p 600 -w 700 -h 500 -a ", plo, " -o ", plo_name, ".png")
-  system(run_rsvg)
+  for (plo in plots) {
+    plo_name <- str_remove(plo, ".svg")
+    run_rsvg <- paste0("rsvg-convert -d 600 -p 600 -w 700 -h 500 -a ", plo, " -o ", plo_name, ".png")
+    system(run_rsvg)
+  } 
 }
 ```
 
