@@ -462,6 +462,33 @@ for (i in 1:nrow(unique_words)) {
 
 unlink(seglist_out, recursive = T)
 unlink(words_out, recursive = T)
+
+dir.create("./data/recordings/derived/illustr/intonation", showWarnings = F)
+
+file.copy(
+  from = "./data/alb-ipa_emuDB/s05_ses/130-broad-focus_bndl/130-broad-focus.wav",
+  to = "./data/recordings/derived/illustr/intonation/40_declarative.wav"
+)
+
+file.copy(
+  from = "./data/alb-ipa_emuDB/s01_ses/134-narrow-focus_bndl/134-narrow-focus.wav",
+  to = "./data/recordings/derived/illustr/intonation/41_contrastive_focus.wav"
+)
+
+file.copy(
+  from = "./data/alb-ipa_emuDB/s01_ses/132-polar-q_bndl/132-polar-q.wav",
+  to = "./data/recordings/derived/illustr/intonation/42_polar_q.wav"
+)
+
+file.copy(
+  from = "./data/alb-ipa_emuDB/s04_ses/132-narrow-focus-q_bndl/132-narrow-focus-q.wav",
+  to = "./data/recordings/derived/illustr/intonation/43_content_q.wav"
+)
+
+file.copy(
+  from = "./data/alb-ipa_emuDB/s04_ses/138-story_bndl/138-story.wav",
+  to = "./data/recordings/derived/illustr/north_wind_and_sun.wav"
+)
 ```
 
 
