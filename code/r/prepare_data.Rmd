@@ -6,6 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
+library(here)
 library(emuR)
 library(wrassp)
 library(tidyverse)
@@ -389,52 +390,55 @@ saveRDS(uti_vowels_2, file = "./data/dataframes/uti-vowels-2.rds")
 # Illustrative recordings
 
 ```{r illustr}
-seglist_out <- "./data/recordings/derived/illustr/alb-ipa_txt_col_from_seglist"
+illustr <- here("data", "recordings", "derived", "illustr")
+dir.create(illustr, showWarnings = F)
+words_out <- here(illustr, "words")
+dir.create(words_out, showWarnings = F)
+seglist_out <- here(illustr, "alb-ipa_txt_col_from_seglist")
 
-if (!dir.exists(seglist_out)) {
- s04_words <- query(
-    alb_ipa_db,
-    "ORT-MAU =~ .*",
-    sessionPattern = "s04",
-    timeRefSegmentLevel = "MAU"
-  ) %>%
-  mutate(id = as.numeric(str_sub(bundle, 1, 3))) %>%
-  filter(labels != "", id < 126)
+s04_words <- query(
+  alb_ipa_db,
+  "ORT-MAU =~ .*",
+  sessionPattern = "s04",
+  timeRefSegmentLevel = "MAU"
+) %>%
+mutate(id = as.numeric(str_sub(bundle, 1, 3))) %>%
+filter(labels != "", id < 126)
 
-  export_seglistToTxtCollection(alb_ipa_db, s04_words, "./data/recordings/derived/illustr/")
+export_seglistToTxtCollection(alb_ipa_db, s04_words, illustr)
 
-  seglist <- read_csv(paste0(seglist_out, "/seglist.csv")) %>%
-    mutate(number = 1) %>%
-    group_by(labels) %>%
-    mutate(
-      repetition = as.factor(cumsum(number)),
-      word = str_sub(bundle, 5),
-      file_name = str_glue("{word}-{repetition}.wav")
-    )
-  
-  words <- unique(seglist$word)
-  wavs <- list.files(seglist_out, "*.wav")
-  
-  file.rename(paste0(seglist_out, "/", wavs), paste0(seglist_out, "/", seglist$file_name))
-  
-  sil <- silence(0.8, xunit = "time", bit = 16, pcm = T)
-  
-  dir.create(str_glue("{seglist_out}/words"), showWarnings = F)
-  
-  for (word in words) {
-    firstw <- readWave(str_glue("{seglist_out}/{word}-1.wav"))
-    secondw <- readWave(str_glue("{seglist_out}/{word}-2.wav"))
-    thirdf <- str_glue("{seglist_out}/{word}-3.wav")
-    if (file.exists(thirdf)) {
-      thirdw <- readWave(thirdf)
-    } else {
-      thirdw <- silence(0.001, xunit = "time", bit = 16, pcm = T)
-    }
-    
-    combined <- bind(sil, firstw, sil, secondw, sil, thirdw, sil)
-    writeWave(combined, str_glue("{seglist_out}/words/{word}.wav"))
+seglist <- read_csv(here(seglist_out, "seglist.csv")) %>%
+  mutate(number = 1) %>%
+  group_by(labels) %>%
+  mutate(
+    repetition = as.factor(cumsum(number)),
+    word = str_sub(bundle, 5),
+    file_name = str_glue("{word}-{repetition}.wav")
+  )
+
+words <- unique(seglist$word)
+file_names <- seglist$file_name
+wavs <- list.files(seglist_out, "*.wav")
+
+file.rename(here(seglist_out, wavs), here(seglist_out, file_names))
+
+sil <- silence(0.8, xunit = "time", bit = 16, pcm = T)
+
+for (word in words) {
+  firstw <- readWave(str_glue("{seglist_out}/{word}-1.wav"))
+  secondw <- readWave(str_glue("{seglist_out}/{word}-2.wav"))
+  thirdf <- str_glue("{seglist_out}/{word}-3.wav")
+  # jan3 only has 2 repetitions, so we need the following
+  if (file.exists(thirdf)) {
+    thirdw <- readWave(thirdf)
+  } else {
+    thirdw <- silence(0.001, xunit = "time", bit = 16, pcm = T)
   }
+  
+  combined <- bind(sil, firstw, sil, secondw, sil, thirdw, sil)
+  writeWave(combined, str_glue("{words_out}/{word}.wav"))
 }
+unlink(seglist_out, recursive = T)
 ```
 
 
