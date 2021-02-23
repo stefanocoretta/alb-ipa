@@ -27,11 +27,20 @@ alb_ipa_links <- tbl(alb_ipa_sql, "links") %>% select(-label)
 alb_ipa_labels <- tbl(alb_ipa_sql, "labels")
 ```
 
-# Read participants metadata
+# Read metadata
 
-```{r participants}
+```{r metadata}
 participants <- read_csv("./data/metadata/participants.csv") %>%
   select(-notes)
+
+stimuli <- read_csv("./data/metadata/stimuli.csv") %>%
+  mutate(
+    order_id = str_pad(order_id, 2, pad = "0"),
+    gloss = str_replace_all(gloss, c(" " = "_")),
+    gloss = str_remove_all(gloss, "[,\\?]"),
+    gloss = str_to_lower(gloss),
+    order_fname = str_glue("{order_id}_{gloss}.wav") 
+  )
 ```
 
 # IPA list 
@@ -393,6 +402,10 @@ illustr <- here("data", "recordings", "derived", "illustr")
 dir.create(illustr, showWarnings = F)
 words_out <- here(illustr, "words")
 dir.create(words_out, showWarnings = F)
+cons_out <- here(illustr, "consonants")
+dir.create(cons_out, showWarnings = F)
+vows_out <- here(illustr, "vowels")
+dir.create(vows_out, showWarnings = F)
 seglist_out <- here(illustr, "alb-ipa_txt_col_from_seglist")
 
 s04_words <- query(
@@ -413,17 +426,26 @@ seglist <- read_csv(here(seglist_out, "seglist.csv")) %>%
     repetition = as.factor(cumsum(number)),
     word = str_sub(bundle, 5),
     file_name = str_glue("{word}-{repetition}.wav")
-  )
+  ) %>%
+  ungroup() %>%
+  rename(spelling = labels) %>%
+  left_join(y = stimuli)
 
-words <- unique(seglist$word)
+unique_words <- seglist %>%
+  select(word, order_fname, example_type) %>%
+  distinct() %>%
+  filter(example_type %in% c("consonants", "vowels"))
 file_names <- seglist$file_name
 wavs <- list.files(seglist_out, "*.wav")
 
 file.rename(here(seglist_out, wavs), here(seglist_out, file_names))
 
-sil <- silence(0.8, xunit = "time", bit = 16, pcm = T)
+sil <- silence(0.2, xunit = "time", bit = 16, pcm = T)
 
-for (word in words) {
+for (i in 1:nrow(unique_words)) {
+  word <- unique_words$word[i]
+  order_fname <- unique_words$order_fname[i]
+  example_type <- unique_words$example_type[i]
   firstw <- readWave(str_glue("{seglist_out}/{word}-1.wav"))
   secondw <- readWave(str_glue("{seglist_out}/{word}-2.wav"))
   thirdf <- str_glue("{seglist_out}/{word}-3.wav")
@@ -435,9 +457,11 @@ for (word in words) {
   }
   
   combined <- bind(sil, firstw, sil, secondw, sil, thirdw, sil)
-  writeWave(combined, str_glue("{words_out}/{word}.wav"))
+  writeWave(combined, str_glue("{illustr}/{example_type}/{order_fname}"))
 }
+
 unlink(seglist_out, recursive = T)
+unlink(words_out, recursive = T)
 ```
 
 
