@@ -11,15 +11,19 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = here::here())
+library(here)
 library(svglite)
+library(Manu)
 library(tidyverse)
 theme_set(theme_light(base_family = "DejaVu Sans"))
 update_geom_defaults("text", list(family = theme_get()$text$family))
+update_geom_defaults("label", list(family = theme_get()$text$family))
+hoiho_7 <- c(get_pal("Hoiho"), "#490B0A")
+options(ggplot2.discrete.fill = hoiho_7)
 library(zoo)
 library(scales)
 library(rticulate)
 library(mgcv)
-library(Manu)
 ```
 
 # Utility functions
@@ -46,6 +50,14 @@ revlog_trans <- function(base = exp(1)) {
     domain = c(1e-100, Inf) ## The domain over which the transformation is valued
   )
 }
+```
+
+```{r directories}
+img_dir <- here("img")
+acou_dir <- here(img_dir, "acoustics")
+dir.create(acou_dir, showWarnings = F)
+arti_dir <- here(img_dir, "articulation")
+dir.create(arti_dir)
 ```
 
 # Read data
@@ -101,10 +113,9 @@ formants %>%
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
-  theme(legend.position = "none") +
-  scale_color_brewer(type = "qual", palette = 2)
+  theme(legend.position = "none")
 
-ggsave("./img/emu/vowels-z.png", width = 7, height = 5)
+ggsave(here(acou_dir, "vowels-z.png"), width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz}
@@ -119,10 +130,9 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz.png", width = 7, height = 5)
+ggsave(here(acou_dir, "vowels-z-hz.png"), width = 7, height = 5)
 ```
 
 ```{r vowels-z-hz-ipa}
@@ -137,10 +147,9 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea")) +
   labs(title = "IPA-style vowel chart")
 
-ggsave("./img/emu/vowels-z-hz-ipa.png", width = 7, height = 5)
+ggsave(here(acou_dir, "vowels-z-hz-ipa.png"), width = 7, height = 5)
 ```
 
 ```{r vowels-z-bark}
@@ -155,10 +164,9 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Kea")) +
   annotate("polygon", x = c(9, 5, 5, 9), y = c(9, 5, 9, 9), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-bark.png", width = 7, height = 5)
+ggsave(here(acou_dir, "vowels-z-hz-bark.png"), width = 7, height = 5)
 ```
 
 
@@ -174,10 +182,9 @@ formants %>%
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
   theme(legend.position = "none") +
-  scale_color_brewer(type = "qual", palette = 2) +
   annotate("polygon", x = c(1250, 500, 500, 1250), y = c(1250, 500, 1250, 1250), alpha = 0.5)
 
-ggsave("./img/emu/vowels-z-hz-log.png", width = 7, height = 5)
+ggsave(here(acou_dir, "vowels-z-hz-log.png"), width = 7, height = 5)
 ```
 
 
@@ -226,15 +233,14 @@ vot %>%
 ```{r vot-jitter}
 vot %>%
   ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.25, size = 3.5, alpha = 0.7) +
+  geom_jitter(width = 0.25, size = 3.5, alpha = 0.8) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
   labs(
     y = "VOT (ms)", x = element_blank()
-  ) +
-  scale_color_manual(values = get_pal("Kaka"))
+  )
 
-ggsave("./img/emu/vot-jitter.svg", width = 7, height = 5, device = svglite)
+ggsave(here(acou_dir, "vot-jitter.svg"), width = 7, height = 5, device = svglite)
 ```
 
 # f0
@@ -424,10 +430,9 @@ f0 %>%
       panel.grid.minor.x = element_blank(),
       panel.grid.minor.y = element_blank()
     ) +
-    scale_color_manual(values = get_pal("Kaka")) +
     coord_cartesian(clip = "off")
 
-ggsave("./img/emu/intonation.png", width = 7, height = 5)
+ggsave(here(acou_dir, "intonation.png"), width = 7, height = 5)
 ```
 
 ```{r int-all}
@@ -451,10 +456,9 @@ f0 %>%
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
       panel.grid.minor.y = element_blank()
-    ) +
-    scale_color_brewer(type = "qual")
+    )
 
-ggsave("./img/emu/intonation-all.png", width = 7, height = 5)
+ggsave(here(acou_dir, "intonation-all.png"), width = 7, height = 5)
 ```
 
 
@@ -507,7 +511,7 @@ moments %>%
   mutate(voicing_manner = factor(voicing_manner, levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))) %>%
   ggplot(aes(consonant, moment_1)) +
   geom_jitter(
-    aes(colour = poa), alpha = 0.7,
+    aes(colour = poa), alpha = 0.8,
     position = position_jitter(width = 0.1, seed = 2534)
   ) +
   geom_violin(fill = NA) +
@@ -517,10 +521,9 @@ moments %>%
     x = element_blank(),
     y = "Centre of gravity (Hz)"
   ) +
-  theme(legend.position = "none") +
-  scale_color_manual(values = get_pal("Putangitangi"))
+  theme(legend.position = "none")
 
-ggsave("./img/emu/cog.svg", width = 7, height = 5, device = svglite)
+ggsave(here(acou_dir, "cog.svg"), width = 7, height = 5, device = svglite)
 ```
 
 ```{r cog-means-sd}
@@ -548,10 +551,9 @@ uti_laterals %>%
   labs(
     colour = "lateral",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
-  ) +
-  scale_color_manual(values = get_pal("Kaka"))
+  )
 
-ggsave("./img/emu/uti-laterals-all.png", width = 7, height = 5)
+ggsave(here(arti_dir, "uti-laterals-all.png"), width = 7, height = 5)
 ```
 
 ```{r laterals-gam, eval=FALSE}
@@ -603,11 +605,10 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
     label.r = unit(0.3, "lines"),
     label.padding = unit(0.3, "lines")
   ) +
-  scale_color_manual(values = c(get_pal("Hoiho"), "#490B0A")) +
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/emu/uti-vowels-gam.png", width = 7, height = 5)
+ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
 ```
 
 ```{r vowels-gam-2}
@@ -628,24 +629,23 @@ predict_polar_gam(vowels_gam_2, length_out = 100) %>%
     x = c(10, 15, -5, 30, -4, 1, 35),
     y = c(9, 24, 5, 20, 15, 20, 7),
     label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
-    fill = c(get_pal("Hoiho"), "#490B0A"),
+    fill = hoiho_7,
     colour = c("white", "white", "black", "white", "white", "white", "white"),
     size = 6,
     label.r = unit(0.3, "lines"),
     label.padding = unit(0.3, "lines")
   ) +
-  scale_color_manual(values = c(get_pal("Hoiho"), "#490B0A")) +
   labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
   theme(legend.position = "none")
 
-ggsave("./img/emu/uti-vowels-gam-2.png", width = 7, height = 5)
+ggsave(here(arti_dir, "uti-vowels-gam-2.png"), width = 7, height = 5)
 ```
 
 
 # Convert svg
 
 ```{r convert}
-plots <- list.files("./img/emu", "*.svg", full.names = T)
+plots <- list.files(acou_dir, "*.svg", full.names = T)
 
 for (plo in plots) {
   plo_name <- str_remove(plo, ".svg")
