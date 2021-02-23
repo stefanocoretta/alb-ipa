@@ -370,7 +370,6 @@ uti_vowels <- read_aaa("./data/ultrasound/vowels-splines.txt", column_names = co
   drop_na()
 
 cols <- c(
-  "speaker",
   "rec_date",
   "time",
   "prompt"

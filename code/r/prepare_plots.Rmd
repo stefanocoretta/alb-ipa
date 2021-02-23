@@ -20,6 +20,7 @@ update_geom_defaults("text", list(family = theme_get()$text$family))
 update_geom_defaults("label", list(family = theme_get()$text$family))
 hoiho_7 <- c(get_pal("Hoiho"), "#490B0A")
 options(ggplot2.discrete.fill = hoiho_7)
+library(ggrepel)
 library(zoo)
 library(scales)
 library(rticulate)
@@ -611,6 +612,16 @@ predict_polar_gam(vowels_gam, length_out = 100) %>%
 ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
 ```
 
+```{r vowels-2}
+uti_vowels_2 %>%
+  ggplot(aes(X, Y, group = .index, colour = prompt, linetype = prompt)) +
+  geom_path() +
+  labs(
+    colour = "vowel", linetype = "vowel",
+    x = "back-to-front (mm)", y = "low-to-high (mm)"
+  )
+```
+
 ```{r vowels-gam-2}
 vowels_gam_2 <- polar_gam(
   Y ~
@@ -621,21 +632,28 @@ vowels_gam_2 <- polar_gam(
 ```
 
 ```{r vowels-gam-2-plot}
-predict_polar_gam(vowels_gam_2, length_out = 100) %>%
+v_gams_2_preds <- predict_polar_gam(vowels_gam_2, length_out = 100)
+
+v_highest_2 <- v_gams_2_preds %>%
+  group_by(prompt) %>%
+  filter(Y == max(Y)) %>%
+  mutate(prompt = str_replace_all(prompt, c("E" = "ɜ", "o" = "ɔ")))
+
+v_gams_2_preds %>%
   ggplot(aes(X, Y, colour = prompt)) +
-  geom_path(size = 2, alpha = 0.8) +
-  annotate(
-    "label",
-    x = c(10, 15, -5, 30, -4, 1, 35),
-    y = c(9, 24, 5, 20, 15, 20, 7),
-    label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
+  geom_path(size = 2.5) +
+  geom_point(size = 0.01, colour = "white") +
+  geom_label_repel(
+    data = v_highest_2,
+    aes(label = prompt),
     fill = hoiho_7,
     colour = c("white", "white", "black", "white", "white", "white", "white"),
     size = 6,
     label.r = unit(0.3, "lines"),
-    label.padding = unit(0.3, "lines")
+    label.padding = unit(0.3, "lines"),
+    min.segment.length = 10
   ) +
-  labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
+  labs(x = "Back to front (mm)", y = "Low to high (mm)") +
   theme(legend.position = "none")
 
 ggsave(here(arti_dir, "uti-vowels-gam-2.png"), width = 7, height = 5)
