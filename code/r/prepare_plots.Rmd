@@ -85,6 +85,7 @@ moments <- readRDS("./data/dataframes/spect_moments.rds")
 uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
 uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
 uti_vowels_2 <- readRDS("./data/dataframes/uti-vowels-2.rds")
+palate <- rticulate::read_aaa("./data/ultrasound/palate-spline.txt", column_names = c("rec_date", "time", "prompt"))
 ```
 
 # Formants
@@ -614,8 +615,9 @@ ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
 
 ```{r vowels-2}
 uti_vowels_2 %>%
-  ggplot(aes(X, Y, group = .index, colour = prompt, linetype = prompt)) +
-  geom_path() +
+  ggplot(aes(X, Y, group = .index)) +
+  geom_path(aes(colour = prompt, linetype = prompt)) +
+  geom_path(data = palate %>% filter(fan_line < 20)) +
   labs(
     colour = "vowel", linetype = "vowel",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
