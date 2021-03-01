@@ -406,6 +406,8 @@ cons_out <- here(illustr, "consonants")
 dir.create(cons_out, showWarnings = F)
 vows_out <- here(illustr, "vowels")
 dir.create(vows_out, showWarnings = F)
+stress_out <- here(illustr, "stress")
+dir.create(stress_out, showWarnings = F)
 seglist_out <- here(illustr, "alb-ipa_txt_col_from_seglist")
 
 s04_words <- query(
@@ -434,7 +436,7 @@ seglist <- read_csv(here(seglist_out, "seglist.csv")) %>%
 unique_words <- seglist %>%
   select(word, order_fname, example_type) %>%
   distinct() %>%
-  filter(example_type %in% c("consonants", "vowels"))
+  filter(example_type %in% c("consonants", "vowels", "stress"))
 file_names <- seglist$file_name
 wavs <- list.files(seglist_out, "*.wav")
 
