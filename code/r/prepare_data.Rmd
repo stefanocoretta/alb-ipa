@@ -25,6 +25,9 @@ alb_ipa_sql <- alb_ipa_db$connection
 alb_ipa_items <- tbl(alb_ipa_sql, "items")
 alb_ipa_links <- tbl(alb_ipa_sql, "links") %>% select(-label)
 alb_ipa_labels <- tbl(alb_ipa_sql, "labels")
+
+attach(loadNamespace("emuR"), name = "emuR")
+source("./code/config/emuR-patch.R")
 ```
 
 # Read metadata
@@ -493,4 +496,18 @@ file.copy(
 )
 ```
 
+# Recordings for example figures
+
+```{r examples}
+examples_out <- here("data", "recordings", "derived", "examples")
+dir.create(examples_out, showWarnings = F)
+
+export_TextGridCollection(
+  alb_ipa_db,
+  examples_out,
+  sessionPattern = "s04",
+  bundlePattern = "018-pata|036-kati|038-qava|002-gjaku",
+  timeRefSegmentLevel = "MAU"
+)
+```
 
