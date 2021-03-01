@@ -25,6 +25,7 @@ library(zoo)
 library(scales)
 library(rticulate)
 library(mgcv)
+library(speakr)
 ```
 
 # Utility functions
@@ -59,6 +60,8 @@ acou_dir <- here(img_dir, "acoustics")
 dir.create(acou_dir, showWarnings = F)
 arti_dir <- here(img_dir, "articulation")
 dir.create(arti_dir, showWarnings = F)
+examples_dir <- here(img_dir, "examples")
+dir.create(examples_dir, showWarnings = F)
 ```
 
 # Read data
@@ -674,5 +677,11 @@ if (system("which rsvg-convert", ignore.stdout = T) == 0) {
     system(run_rsvg)
   } 
 }
+```
+
+# Example figures
+
+```{r praat-figures}
+praat_run()
 ```
 
