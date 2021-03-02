@@ -461,7 +461,7 @@ for (i in 1:nrow(unique_words)) {
     thirdw <- silence(0.001, xunit = "time", bit = 16, pcm = T)
   }
   
-  combined <- bind(sil, firstw, sil, secondw, sil, thirdw, sil)
+  combined <- tuneR::bind(sil, firstw, sil, secondw, sil, thirdw, sil)
   writeWave(combined, str_glue("{illustr}/{example_type}/{order_fname}"))
 }
 
