@@ -562,7 +562,8 @@ uti_laterals %>%
   geom_path(data = uti_palate %>% filter(fan_line < 23), linetype = "dashed") +
   labs(
     colour = "lateral",
-    x = "back-to-front (mm)", y = "low-to-high (mm)"
+    x = "back-to-front (mm)", y = "low-to-high (mm)",
+    caption = "Rolling mean filter, order = 5"
   ) +
   scale_color_manual(values = hoiho_7[c(1, 6, 7)])
 
@@ -613,7 +614,10 @@ v_gams_preds %>%
     label.padding = unit(0.3, "lines"),
     min.segment.length = 15
   ) +
-  labs(x = "Back to front (mm)", y = "Low to high (mm)") +
+  labs(
+    x = "Back to front (mm)", y = "Low to high (mm)",
+    caption = "Polar GAM smoothing, k = 8"
+  ) +
   theme(legend.position = "none")
 
 ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
