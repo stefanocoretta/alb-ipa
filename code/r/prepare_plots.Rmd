@@ -682,6 +682,6 @@ if (system("which rsvg-convert", ignore.stdout = T) == 0) {
 # Example figures
 
 ```{r praat-figures}
-praat_run()
+praat_run("./code/praat/plot_examples.praat")
 ```
 

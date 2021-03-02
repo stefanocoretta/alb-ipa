@@ -1,3 +1,21 @@
+# 2021-03-02
+
+## Added
+
+- Illustrative recordings of stress `data/recordings/derived/illustr/`.
+
+- Recordings for example figures in `data/recordings/derived/examples/`.
+
+- Example figures in `img/examples/`.
+
+## Changed
+
+- Segmentation of <q> and <gj> is all speakers.
+
+- Updated data that relies on <q> and <gj> segmentation.
+
+
+
 # 2021-02-23
 
 ## Added
