@@ -14,6 +14,8 @@
 
 - Updated data that relies on <q> and <gj> segmentation.
 
+- Resplined laterals and updated figures.
+
 
 
 # 2021-02-23

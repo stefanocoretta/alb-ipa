@@ -87,8 +87,7 @@ moments <- readRDS("./data/dataframes/spect_moments.rds")
 # UTI
 uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
 uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
-uti_vowels_2 <- readRDS("./data/dataframes/uti-vowels-2.rds")
-palate <- rticulate::read_aaa("./data/ultrasound/palate-spline.txt", column_names = c("rec_date", "time", "prompt"))
+uti_palate <- readRDS("./data/dataframes/uti-palate.rds")
 ```
 
 # Formants
@@ -542,43 +541,40 @@ moments %>%
 
 ## Laterals
 
-```{r lateral-splines-alpha}
-uti_lat <- uti_laterals %>%
-  ggplot(aes(X, Y, group = id, colour = prompt, alpha = time_norm)) +
-  geom_path()
-```
-
-```{r laterals-all}
+```{r laterals, message=F}
 uti_laterals %>%
   mutate(prompt = recode_factor(prompt, ala = "/l/", alla = "/ɫ/")) %>%
-  ggplot(aes(X, Y, group = id, colour = prompt)) +
-  geom_path(alpha = 0.7) +
+  transform_coord(use_XY = T) %>%
+  group_by(prompt) %>%
+  mutate(
+    Y_smooth = (
+      lag(Y, n = 2, default = first(Y)) +
+      lag(Y, default = first(Y)) +
+      Y +
+      lead(Y, default = last(Y)) +
+      lead(Y, n = 2, default = last(Y))
+    ) / 5,
+    Y = Y_smooth
+  ) %>%
+  transform_coord(to = "cartesian", origin = c(10.6042772344165, -49.4069295776227), use_XY = T) %>%
+  ggplot(aes(X, Y)) +
+  geom_path(aes(colour = prompt), size = 1) +
+  geom_path(data = uti_palate %>% filter(fan_line < 23), linetype = "dashed") +
   labs(
     colour = "lateral",
     x = "back-to-front (mm)", y = "low-to-high (mm)"
-  )
+  ) +
+  scale_color_manual(values = hoiho_7[c(1, 6, 7)])
 
-ggsave(here(arti_dir, "uti-laterals-all.png"), width = 7, height = 5)
+ggsave(here(arti_dir, "uti-laterals.png"), width = 7, height = 5)
 ```
 
-```{r laterals-gam, eval=FALSE}
-laterals_gam <- polar_gam(
-  Y ~
-    s(X, by = prompt),
-  data = uti_laterals %>% filter(fan_line > 5, fan_line < 40),
-  fan_lines = c(15, 20)
-)
-```
-
-```{r laterals-gam-plot, eval=FALSE}
-plot_polar_smooths(laterals_gam, X, prompt, exclude_random = FALSE)
-```
 
 ## Vowels
 
 ```{r vowels}
 uti_vowels %>%
-  ggplot(aes(X, Y, group = id, colour = prompt, linetype = prompt)) +
+  ggplot(aes(X, Y, group = prompt, colour = prompt, linetype = prompt)) +
   geom_path() +
   labs(
     colour = "vowel", linetype = "vowel",
@@ -596,72 +592,31 @@ vowels_gam <- polar_gam(
 ```
 
 ```{r vowels-gam-plot}
-predict_polar_gam(vowels_gam, length_out = 100) %>%
-  ggplot(aes(X, Y, colour = prompt)) +
-  geom_path(size = 2, alpha = 0.8) +
-  annotate(
-    "label",
-    x = c(10, 20, 0, 30, -3, 5, 35),
-    y = c(11, 24, 8.5, 21, 15, 20, 12.5),
-    label = c("a", "e", "ɜ", "i", "ɔ", "u", "y"),
-    fill = c(get_pal("Hoiho"), "#490B0A"),
-    colour = c("white", "white", "black", "white", "white", "white", "white"),
-    size = 6,
-    label.r = unit(0.3, "lines"),
-    label.padding = unit(0.3, "lines")
-  ) +
-  labs(x = "back-to-front (mm)", y = "low-to-high (mm)") +
-  theme(legend.position = "none")
+v_gams_preds <- predict_polar_gam(vowels_gam, length_out = 100)
 
-ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
-```
-
-```{r vowels-2}
-uti_vowels_2 %>%
-  ggplot(aes(X, Y, group = .index)) +
-  geom_path(aes(colour = prompt, linetype = prompt)) +
-  geom_path(data = palate %>% filter(fan_line < 20)) +
-  labs(
-    colour = "vowel", linetype = "vowel",
-    x = "back-to-front (mm)", y = "low-to-high (mm)"
-  )
-```
-
-```{r vowels-gam-2}
-vowels_gam_2 <- polar_gam(
-  Y ~
-    s(X, prompt, bs = "fs", k = 8),
-  data = uti_vowels_2 %>% mutate(prompt = as.factor(prompt)),
-  fan_lines = c(15, 20)
-)
-```
-
-```{r vowels-gam-2-plot}
-v_gams_2_preds <- predict_polar_gam(vowels_gam_2, length_out = 100)
-
-v_highest_2 <- v_gams_2_preds %>%
+v_highest <- v_gams_preds %>%
   group_by(prompt) %>%
   filter(Y == max(Y)) %>%
   mutate(prompt = str_replace_all(prompt, c("E" = "ɜ", "o" = "ɔ")))
 
-v_gams_2_preds %>%
+v_gams_preds %>%
   ggplot(aes(X, Y, colour = prompt)) +
   geom_path(size = 2.5) +
   geom_point(size = 0.01, colour = "white") +
   geom_label_repel(
-    data = v_highest_2,
+    data = v_highest,
     aes(label = prompt),
     fill = hoiho_7,
     colour = c("white", "white", "black", "white", "white", "white", "white"),
     size = 6,
     label.r = unit(0.3, "lines"),
     label.padding = unit(0.3, "lines"),
-    min.segment.length = 10
+    min.segment.length = 15
   ) +
   labs(x = "Back to front (mm)", y = "Low to high (mm)") +
   theme(legend.position = "none")
 
-ggsave(here(arti_dir, "uti-vowels-gam-2.png"), width = 7, height = 5)
+ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
 ```
 
 
