@@ -145,8 +145,8 @@ qava_gjaku_tg = Concatenate
 Replace interval texts: 2, 1, 0, "<p:>", "", "literals"
 Remove right boundary: 1, 3
 Remove right boundary: 2, 6
-Set interval text: 2, 2, "t̻ʃ"
-Set interval text: 2, 7, "d̻ʒ"
+Set interval text: 2, 2, "t̻ʃ̻"
+Set interval text: 2, 7, "d̻ʒ̻"
 
 Erase all
 
