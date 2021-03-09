@@ -219,14 +219,6 @@ ggplot(formants, aes(x = F2, y = F1, col = vowel)) +
 
 # VOT
 
-```{r vot-bar}
-ggplot(vot, aes(x = vot, y = consonant)) +
-  stat_summary(fun = mean, geom = "bar") +
-  stat_summary(fun.data = mean_se,
-               geom = "errorbar",
-               color = "red")
-```
-
 ```{r vot-dist}
 vot %>%
   ggplot(aes(vot)) +
@@ -247,18 +239,7 @@ vot %>%
 ggsave(here(acou_dir, "vot-jitter.svg"), width = 7, height = 5, device = svglite)
 ```
 
-# f0
-
-```{r f0-all}
-# all speakers and sentence types together
-f0 %>%
-  ggplot(aes(norm_timepoint, f0, colour = speaker, shape = sentence)) +
-  geom_point(alpha = 0.2) +
-  labs(
-    x = "f0 (Hz)",
-    y = "normalised time"
-  )
-```
+# Intonation
 
 ```{r f0-by-sentence, out.width="200%"}
 # per sentence type, speakers together
@@ -287,123 +268,8 @@ f0 %>%
   theme(legend.pos = "bottom")
 ```
 
-```{r f0-by-token-smoothed, fig.height=7, out.width="200%"}
-f0 %>%
-  group_by(token) %>%
-  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
-  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
-  geom_point(size = 0.5) +
-  facet_grid(speaker + repetition ~ sentence) +
-  labs(
-    title = "Smoothed f0 contours",
-    caption = "Rolling mean filter, order = 21",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  theme(legend.pos = "bottom")
-```
 
-```{r f0-illustr, fig.height=7, out.width="200%"}
-f0 %>%
-  group_by(token) %>%
-  mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%
-  filter(
-    repetition == 2,
-    speaker == "s01" & sentence_type == "narrow-focus" |
-    speaker == "s01" & sentence_type == "polar-q" |
-    speaker == "s04" & sentence_type == "broad-focus" |
-    speaker == "s04" & sentence_type == "narrow-focus-q"
-  ) %>%
-  ggplot(aes(norm_timepoint, f0_smooth, colour = speaker)) +
-  geom_point(size = 0.5) +
-  facet_grid(. ~ sentence) +
-  labs(
-    title = "Smoothed f0 contours",
-    caption = "Rolling mean filter, order = 21",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  theme(legend.pos = "bottom")
-```
-
-```{r f0-by-speaker, out.width="200%"}
-# per speaker, sentences together
-f0 %>%
-  ggplot(aes(norm_timepoint, f0, colour = sentence, shape = repetition)) +
-  facet_wrap(~speaker, nrow = 3) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    x = "f0 (Hz)",
-    y = "normalised time"
-  )
-```
-
-```{r f0-by-sentence-speaker}
-# per sentence and speaker
-f0 %>%
-  filter(speaker == "s01") %>%
-  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
-  facet_wrap(~ sentence) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    title = "s01",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  ylim(0, 600)
-
-f0 %>%
-  filter(speaker == "s02") %>%
-  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
-  facet_wrap(~ sentence) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    title = "s02",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  ylim(0, 600)
-
-f0 %>%
-  filter(speaker == "s04") %>%
-  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
-  facet_wrap(~ sentence) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    title = "s04",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  ylim(0, 600)
-
-f0 %>%
-  filter(speaker == "s05") %>%
-  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
-  facet_wrap(~ sentence) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    title = "s05",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  ylim(0, 600)
-
-f0 %>%
-  filter(speaker == "s06") %>%
-  ggplot(aes(norm_timepoint, f0, colour = repetition)) +
-  facet_wrap(~ sentence) +
-  geom_point(alpha = 0.5, size = 0.5) +
-  labs(
-    title = "s06",
-    x = "f0 (Hz)",
-    y = "normalised time"
-  ) +
-  ylim(0, 600)
-```
-
-# Intonation
-
-```{r int}
+```{r intonation-illustr, message=FALSE, warning=FALSE}
 f0 %>%
   group_by(token) %>%
   mutate(f0_smooth = c(rep(NA, 10), rollmean(f0, 21), rep(NA, 10))) %>%

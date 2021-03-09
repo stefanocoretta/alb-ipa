@@ -86,3 +86,21 @@ The formant trajectories were corrected with the EMU webAPP the word list files,
 
 The *time of the closure release* and the *voice onset time* was manually annotated for /p, b, t, d, k, g, ts, dz, tʃ, dʒ, t̻ʃ̻, d̻ʒ̻/, in the `RELS` and `VOI` event levels respectively.
 
+## Data preparation
+
+The file `code/r/prepare_data.Rmd` holds the code used to query the emuDB, process the ultrasound tongue imaging data, and extract the illustrative recordings and the recordings for plotting the example figures of VOT and affricates.
+
+The following measures were extracted from the emuDB and packaged into `.rds` files, saved in `data/dataframes/`:
+
+- Vowel formants.
+- Plosive VOT.
+- Fundamental frequency (f0) and syllable boundaries of the sentences that illustrate intonation.
+- Spectral moments and centre of gravity (CoG) of fricatives and fricated portion of affricates.
+
+For more information, see the code documentation in `code/r/prepare_data.Rmd`.
+
+## Data plotting
+
+The figures included in the manuscript were generated with the code in `code/r/prepare_plots.Rmd`.
+This file also contains code for extra figures.
+
