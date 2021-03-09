@@ -155,7 +155,7 @@ vot <- alb_ipa_items %>%
 saveRDS(vot, here::here(dataframes, "vot.rds"))
 ```
 
-## F0
+## Intonation
 
 First, we query the emuDB to get the relevant sentences.
 
@@ -218,14 +218,11 @@ f0 <- f0 %>%
   select(speaker, gender, segment, word, sentence, sentence_type, repetition, f0, norm_timepoint, times_orig, sentence_dur, token)
 ```
 
-
 And we now save the tibble.
 
 ```{r save-f0}
 saveRDS(f0, here::here(dataframes, "f0.rds"))
 ```
-
-## Intonation
 
 ```{r syl-f0}
 syl <- query(alb_ipa_db, "SYL =~ .*", calcTimes = T) %>%
@@ -258,7 +255,7 @@ saveRDS(syl_f0, here::here(dataframes, "syl_f0.rds"))
 ```
 
 
-## Spectral moments (CoG)
+## Spectral DFT and moments
 
 ```{r affr-rels}
 affr_rels = query(
