@@ -1,5 +1,5 @@
 ---
-title: "IPA illustration of Northern Tosk"
+title: "IPA illustration of Northern Tosk Albanian [tosk1239]"
 output: github_document
 ---
 
@@ -9,7 +9,11 @@ knitr::opts_knit$set(root.dir = here::here())
 library(fs)
 ```
 
-This is the GitHub repository of the project *IPA illustration of Northern Tosk*.
+This is the GitHub repository of the project *IPA illustration of Northern Tosk Albanian*.
+
+## License
+
+Data is released under CC-BY 4.0 International, code is released under MIT License. See `LICENSE` file.
 
 ## Directory structure
 

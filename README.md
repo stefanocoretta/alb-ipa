@@ -1,8 +1,13 @@
-IPA illustration of Northern Tosk
+IPA illustration of Northern Tosk Albanian \[tosk1239\]
 ================
 
 This is the GitHub repository of the project *IPA illustration of
-Northern Tosk*.
+Northern Tosk Albanian*.
+
+## License
+
+Data is released under CC-BY 4.0 International, code is released under
+MIT License. See `LICENSE` file.
 
 ## Directory structure
 
@@ -50,8 +55,11 @@ the following sub-directories:
             this repository.
         -   `illustr/`: illustrative recordings of `consonants/`,
             `vowels/`, `intonation/`, and *The North Wind and the Sun*.
+        -   `examples/`: recordings for the figures with annotated
+            waveform and spectrogram exemplifying VOT and frication.
 -   `alb-ipa_emuDB/`: EMU-SDMS database.
--   `ultrasound/`: spline data from ultrasound tongue imaging.
+-   `ultrasound/`: tongue contour spline data from ultrasound tongue
+    imaging (UTI data on the OSF).
 -   `varia/`: a miscellanea folder with files used with different
     services.
 
