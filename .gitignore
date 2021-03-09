@@ -10,6 +10,7 @@ data/recordings/derived/post-align/
 *._
 *.directory
 alb-ipa.sublime-workspace
+data.zip
 
 ########
 # R

@@ -1,0 +1,31 @@
+---
+title: "OSF data upload"
+author: "Stefano Coretta"
+date: "09/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+library(tidyverse)
+library(osfr)
+```
+
+# Manage OSF with osfr
+
+This document contains the code used to manage the OSF repo with the [osfr](https://docs.ropensci.org/osfr/) package.
+
+# Upload data to OSF Data component
+
+```{r retrieve}
+# Main repo https://osf.io/vry3h/
+# osf_repo <- osf_retrieve_node("vry3h")
+# Repo Data component
+osf_data <- osf_retrieve_node("u43sg")
+```
+
+```{r upload}
+osf_upload(osf_data, path = "./data.zip", conflicts = "overwrite", progress = TRUE)
+```
+
