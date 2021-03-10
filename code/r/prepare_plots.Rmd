@@ -228,8 +228,9 @@ vot %>%
 
 ```{r vot-jitter}
 vot %>%
+  filter(consonant %in% c("p", "t", "k", "b", "d", "\u261")) %>%
   ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.25, size = 3.5, alpha = 0.8) +
+  geom_jitter(width = 0.25, size = 3.5, alpha = 0.9) +
   geom_hline(aes(yintercept = 0)) +
   coord_flip() +
   labs(
@@ -469,6 +470,7 @@ v_highest <- v_gams_preds %>%
 v_gams_preds %>%
   ggplot(aes(X, Y, colour = prompt)) +
   geom_path(size = 2.5) +
+  geom_path(data = uti_palate %>% filter(fan_line < 23), size = 1, colour = "grey") +
   geom_point(size = 0.01, colour = "white") +
   geom_label_repel(
     data = v_highest,
