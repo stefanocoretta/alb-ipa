@@ -1,3 +1,13 @@
+# 2021-03-10
+
+## Changed
+
+- Add palate to UTI vowels plot.
+
+- Remove affricates from VOT plot.
+
+
+
 # 2021-03-02
 
 ## Added
