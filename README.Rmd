@@ -15,6 +15,7 @@ meta <- yaml::read_yaml("./meta.yaml")
 `r badger::badge_doi("10.17605/OSF.IO/VRY3H", "yellow")`
 
 This is the GitHub repository of the project *IPA illustration of Northern Tosk Albanian*.
+See the full **research compendium** at <https://osf.io/vry3h/>.
 
 ## License
 

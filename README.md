@@ -6,7 +6,8 @@ IPA illustration of Northern Tosk Albanian \[tosk1239\]
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/VRY3H-yellow.svg)](https://doi.org/10.17605/OSF.IO/VRY3H)
 
 This is the GitHub repository of the project *IPA illustration of
-Northern Tosk Albanian*.
+Northern Tosk Albanian*. See the full **research compendium** at
+<https://osf.io/vry3h/>.
 
 ## License
 
