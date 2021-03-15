@@ -1,6 +1,10 @@
 IPA illustration of Northern Tosk Albanian \[tosk1239\]
 ================
 
+![](https://img.shields.io/badge/version-v1.2-green.svg)
+![](https://img.shields.io/badge/version-2021--03--15-blue.svg)
+[![](https://img.shields.io/badge/doi-10.17605/OSF.IO/VRY3H-yellow.svg)](https://doi.org/10.17605/OSF.IO/VRY3H)
+
 This is the GitHub repository of the project *IPA illustration of
 Northern Tosk Albanian*.
 
@@ -17,7 +21,7 @@ MIT License. See `LICENSE` file.
 -   `code/`: contains code for data (pre-)processing, organised in the
     following sub-directories.
     -   `config/`: configuration script for setting up the EMU-SDMS
-        database.
+        database and the OFS repository.
     -   `praat/`: Praat scripts for data-preprocessing.
     -   `r/`: R scripts for data transformation, wrangling, and
         plotting.
