@@ -32,8 +32,8 @@ from this `git` repository—holds the data, and the `data.dvc` file,
 which is instead versioned by `git`, enables data transfer to and from
 the `dvc` repository. Due to server limitations at the hosting
 institution, we cannot grant access to the `dvc` repository, and we
-instead make the data available as an archive (which also includes the
-contents of this GitHub repository) on the Open Science Framework (TBA).
+instead make the data available as a `.zip` archive on the Open Science
+Framework (<https://osf.io/u43sg/>).
 
 The archive contains the directories of this GitHub repository and the
 `data` directory with the project data. The `data` directory contains
