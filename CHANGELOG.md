@@ -1,3 +1,11 @@
+# 2021-04-02
+
+## Changed
+
+- Illustrative examples now have natural silence taken from -200 and +200 ms from the word start and end.
+
+
+
 # 2021-03-10
 
 ## Changed
