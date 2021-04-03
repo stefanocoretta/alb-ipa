@@ -1,3 +1,11 @@
+# 2021-04-03
+
+## Changed
+
+- Filtered all wav files with stop band 0-100 Hz.
+
+
+
 # 2021-04-02
 
 ## Changed
