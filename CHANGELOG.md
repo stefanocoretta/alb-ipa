@@ -1,5 +1,9 @@
 # 2021-05-07
 
+## Added
+
+- Rhotics example recordings and figures.
+
 ## Removed
 
 - Reverted commit 991befc (wav filter).
