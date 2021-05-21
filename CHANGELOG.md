@@ -1,3 +1,9 @@
+# 2021-05-07
+ 
+## Added
+
+- Rhotics example recordings and figures.
+
 # 2021-04-03
 
 ## Changed
