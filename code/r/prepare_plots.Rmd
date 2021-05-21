@@ -133,8 +133,8 @@ formants %>%
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
-  theme(legend.position = "none") +
-  annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
+  theme(legend.position = "none") 
+  # annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
 ggsave(here(acou_dir, "vowels-z-hz.png"), width = 7, height = 5)
 ```
