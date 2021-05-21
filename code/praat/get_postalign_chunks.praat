@@ -68,6 +68,7 @@ for speaker from 1 to speakers
 
       selectObject: words
       words_part = Extract part: prev_half, fol_half, "rectangular", 1, "no"
+      words_part_filt = Filter (stop Hann band): 0, 50, 100
       createDirectory: "'postalign_dir$'/'speaker$'/"
       @zeroFill: word_idx, 3
       word_safe$ = replace$(word$, "ë", "3", 0)
@@ -78,7 +79,7 @@ for speaker from 1 to speakers
       tg_part = Extract part: prev_half, fol_half, "no"
       Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'word_safe$'.TextGrid"
 
-      removeObject: words_part, tg_part
+      removeObject: words_part, words_part_filt, tg_part
 
       word_idx += 1
     endif
@@ -103,6 +104,7 @@ for speaker from 1 to speakers
 
       selectObject: sentences
       sent_part = Extract part: s_start, s_end, "rectangular", 1, "no"
+      sent_part_filt = Filter (stop Hann band): 0, 50, 100
       createDirectory: "'postalign_dir$'/'speaker$'/"
       @zeroFill: word_idx, 3
       Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.wav"
@@ -112,7 +114,7 @@ for speaker from 1 to speakers
       Remove tier: 1
       Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-'sent$'.TextGrid"
 
-      removeObject: sent_part, tg_part
+      removeObject: sent_part, sent_part_filt, tg_part
 
       word_idx += 1
     endif
@@ -122,6 +124,7 @@ for speaker from 1 to speakers
   # Story
   @zeroFill: word_idx, 3
   Read from file: "'align_dir$'/'speaker$'/story.wav"
+  Filter (stop Hann band): 0, 50, 100
   Save as WAV file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.wav"
   Read from file: "'align_dir$'/'speaker$'/story.TextGrid"
   Save as text file: "'postalign_dir$'/'speaker$'/'zeroFill.return$'-story.TextGrid"
