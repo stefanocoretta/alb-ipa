@@ -440,7 +440,7 @@ ggsave(here(arti_dir, "uti-laterals.png"), width = 7, height = 5)
 
 ## Vowels
 
-```{r vowels}
+```{r vowels-uti}
 uti_vowels %>%
   ggplot(aes(X, Y, group = prompt, colour = prompt, linetype = prompt)) +
   geom_path() +
