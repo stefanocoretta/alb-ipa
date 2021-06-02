@@ -1,0 +1,5 @@
+outs:
+- md5: caa1290c141c04228dd99484f6047ca3.dir
+  size: 2166779872
+  nfiles: 3630
+  path: data
