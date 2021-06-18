@@ -1,3 +1,13 @@
+# 2021-06-18
+
+## Fixed
+
+- Vowel offset boundaries spilling over into the closure are fixed.
+
+- Two RELS event boundaries of /d/ were linked to /t/. 
+
+
+
 # 2021-05-07
  
 ## Added
