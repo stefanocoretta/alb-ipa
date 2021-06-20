@@ -151,3 +151,12 @@ add_ssffTrackDefinition(
 )
 ```
 
+```{r get-intensity}
+add_ssffTrackDefinition(
+  db_handle,
+  name = "rmsa",
+  onTheFlyFunctionName = "rmsana",
+  verbose = TRUE
+)
+```
+

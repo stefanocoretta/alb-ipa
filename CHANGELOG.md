@@ -1,5 +1,9 @@
 # 2021-06-20
 
+## Added
+
+- `stress.rds` with stress related measurements (duration, intensity).
+
 ## Fixed
 
 - Fix segmentation of words illustrating lexical stress.
