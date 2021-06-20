@@ -155,6 +155,66 @@ vot <- alb_ipa_items %>%
 saveRDS(vot, here::here(dataframes, "vot.rds"))
 ```
 
+## Stress
+
+```{r vow-stress}
+vow_stress <- alb_ipa_db %>%
+  # Get vowels from words illustrating stress
+  query(
+  "[MAU == e| i | y | u | @ | o | a]",
+  bundlePattern = "[0-9]*-(liri|mulliri|flutura)"
+  ) %>%
+  # Requery each vowel segment to get the word from the ORT-MAU level
+  bind_cols(
+    requery_hier(alb_ipa_db, ., "ORT-MAU", timeRefSegmentLevel = "MAU") %>% select(labels) %>% rename(word = labels)
+  )
+```
+
+```{r f0-stress}
+f0_stress <- alb_ipa_db %>%
+  get_trackdata(
+    vow_stress,
+    cut = 0.5,
+    ssffTrackName = "F0"
+  )
+```
+
+```{r intensity-stress}
+intensity_stress <- alb_ipa_db %>%
+  get_trackdata(
+    vow_stress,
+    cut = 0.5,
+    ssffTrackName = "rmsa"
+  )
+```
+
+```{r stress}
+stress <- left_join(vow_stress, f0_stress %>% rename(f0 = `T1`)) %>%
+  left_join(y = intensity_stress %>% rename(intensity = `T1`)) %>%
+  rename(vowel = labels) %>%
+  group_by(session, bundle) %>%
+  mutate(
+    syl = 1,
+    syl = cumsum(syl)
+  ) %>%
+  mutate(
+    duration = end - start,
+    stress = case_when(
+      vowel == "u" & word == "flutura" & syl == 1 ~ "stressed",
+      vowel == "i" & word == "mulliri" & syl == 2 ~ "stressed",
+      vowel == "i" & word == "liri" & syl == 2 ~ "stressed",
+      TRUE ~ "unstressed"
+    )
+  )
+```
+
+And we save the tibble.
+
+```{r save-stress}
+saveRDS(stress, here::here(dataframes, "stress.rds"))
+```
+
+
 ## Intonation
 
 First, we query the emuDB to get the relevant sentences.
