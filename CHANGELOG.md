@@ -1,3 +1,13 @@
+# 2021-06-20
+
+## Fixed
+
+- Fix segmentation of words illustrating lexical stress.
+
+- Fix segmentation of /kati/ in S04.
+
+
+
 # 2021-06-18
 
 ## Fixed
