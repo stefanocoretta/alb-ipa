@@ -204,7 +204,17 @@ stress <- left_join(vow_stress, f0_stress %>% rename(f0 = `T1`)) %>%
       vowel == "i" & word == "mulliri" & syl == 2 ~ "stressed",
       vowel == "i" & word == "liri" & syl == 2 ~ "stressed",
       TRUE ~ "unstressed"
-    )
+    ),
+    # name syllables instead of number
+    syl = case_when(
+      word == "liri" & syl == 1 ~ "penultimate",
+      word == "liri" & syl == 2 ~ "ultimate",
+      syl == 1 ~ "antepenultimate",
+      syl == 2 ~ "penultimate",
+      syl == 3 ~ "ultimate"
+    ),
+    syl = factor(syl, levels = c("antepenultimate", "penultimate", "ultimate")),
+    word = factor(word, levels = c("liri", "mulliri", "flutura"))
   )
 ```
 

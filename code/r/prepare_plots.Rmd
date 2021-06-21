@@ -73,6 +73,9 @@ formants <- readRDS("./data/dataframes/formants.rds")
 # VOT
 vot <- readRDS("./data/dataframes/vot.rds")
 
+# stress
+stress <- readRDS("./data/dataframes/stress.rds")
+
 # f0
 f0 <- readRDS("./data/dataframes/f0.rds")
 
@@ -229,15 +232,64 @@ vot %>%
 ```{r vot-jitter}
 vot %>%
   filter(consonant %in% c("p", "t", "k", "b", "d", "\u261")) %>%
-  ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker, shape = speaker)) +
-  geom_jitter(width = 0.25, size = 3.5, alpha = 0.9) +
+  ggplot(aes(reorder(consonant, desc(consonant)), vot, colour = speaker)) +
+  geom_line(aes(group = interaction(speaker, consonant)), position = position_dodge(width = 0.5)) +
+  geom_point(size = 1.5, alpha = 0.9, position = position_dodge(width = 0.5), aes(group = speaker)) +
   geom_hline(aes(yintercept = 0)) +
+  scale_y_continuous(breaks = seq(-200, 200, by = 50)) +
   coord_flip() +
   labs(
-    y = "VOT (ms)", x = element_blank()
+    y = "Voice Onset Time (ms)", x = element_blank(),
+    caption = "Time 0 corresponds to the plosive release."
   )
 
 ggsave(here(acou_dir, "vot-jitter.svg"), width = 7, height = 5, device = svglite)
+```
+
+```{r vot-table}
+vot %>%
+  filter(consonant %in% c("p", "t", "k", "b", "d", "\u261")) %>%
+  group_by(consonant) %>%
+  summarise(
+    mean_vot = round(mean(vot, na.rm = TRUE)),
+    sd_vot = round(sd(vot, na.rm = TRUE))
+  )
+```
+
+
+# Stress
+
+```{r stress-duration}
+stress %>%
+  ggplot(aes(syl, duration)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-duration.png"), width = 7, height = 5)
+```
+
+```{r stress-intensity}
+stress %>%
+  ggplot(aes(syl, intensity)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-intensity.png"), width = 7, height = 5)
+```
+
+```{r stress-f0}
+stress %>%
+  ggplot(aes(syl, f0)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-f0.png"), width = 7, height = 5)
 ```
 
 # Intonation
