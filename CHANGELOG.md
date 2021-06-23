@@ -1,8 +1,8 @@
-# 2021-06-20
+# v2
 
 ## Added
 
-- `stress.rds` with stress related measurements (duration, intensity).
+- `stress.rds` with stress related measurements (duration, intensity, f0).
 
 ## Fixed
 

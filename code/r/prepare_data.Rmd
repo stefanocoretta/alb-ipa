@@ -177,6 +177,18 @@ f0_stress <- alb_ipa_db %>%
     cut = 0.5,
     ssffTrackName = "F0"
   )
+
+f0_stress_x <- alb_ipa_db %>%
+  get_trackdata(
+    vow_stress,
+    ssffTrackName = "F0"
+  ) %>% 
+  group_by(session, bundle, labels, start_item_id) %>%
+  summarise(
+    f0_max = max(T1, na.rm = TRUE),
+    f0_mean = mean(T1, na.rm = TRUE),
+    .groups = "drop"
+  )
 ```
 
 ```{r intensity-stress}
@@ -186,11 +198,25 @@ intensity_stress <- alb_ipa_db %>%
     cut = 0.5,
     ssffTrackName = "rmsa"
   )
+
+intensity_stress_x <- alb_ipa_db %>%
+  get_trackdata(
+    vow_stress,
+    ssffTrackName = "rmsa"
+  ) %>%
+  group_by(session, bundle, labels, start_item_id) %>%
+  summarise(
+    intensity_max = max(T1, na.rm = TRUE),
+    intensity_mean = mean(T1, na.rm = TRUE),
+    .groups = "drop"
+  )
 ```
 
 ```{r stress}
 stress <- left_join(vow_stress, f0_stress %>% rename(f0 = `T1`)) %>%
   left_join(y = intensity_stress %>% rename(intensity = `T1`)) %>%
+  left_join(y = f0_stress_x) %>%
+  left_join(y = intensity_stress_x) %>%
   rename(vowel = labels) %>%
   group_by(session, bundle) %>%
   mutate(
