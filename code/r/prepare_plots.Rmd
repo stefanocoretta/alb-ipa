@@ -252,7 +252,8 @@ vot %>%
   group_by(consonant) %>%
   summarise(
     mean_vot = round(mean(vot, na.rm = TRUE)),
-    sd_vot = round(sd(vot, na.rm = TRUE))
+    sd_vot = round(sd(vot, na.rm = TRUE)),
+    tokens = n()
   )
 ```
 
@@ -279,6 +280,24 @@ stress %>%
   scale_color_manual(values = hoiho_7[c(4, 1)])
 
 ggsave(here(acou_dir, "stress-intensity.png"), width = 7, height = 5)
+
+stress %>%
+  ggplot(aes(syl, intensity_max)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-intensity-max.png"), width = 7, height = 5)
+
+stress %>%
+  ggplot(aes(syl, intensity_mean)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-intensity-mean.png"), width = 7, height = 5)
 ```
 
 ```{r stress-f0}
@@ -290,6 +309,24 @@ stress %>%
   scale_color_manual(values = hoiho_7[c(4, 1)])
 
 ggsave(here(acou_dir, "stress-f0.png"), width = 7, height = 5)
+
+stress %>%
+  ggplot(aes(syl, f0_max)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-f0-max.png"), width = 7, height = 5)
+
+stress %>%
+  ggplot(aes(syl, f0_mean)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+ggsave(here(acou_dir, "stress-f0-mean.png"), width = 7, height = 5)
 ```
 
 # Intonation
