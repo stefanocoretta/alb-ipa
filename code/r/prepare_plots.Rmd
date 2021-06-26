@@ -329,6 +329,36 @@ stress %>%
 ggsave(here(acou_dir, "stress-f0-mean.png"), width = 7, height = 5)
 ```
 
+```{r stress-scaled}
+stress %>%
+  group_by(session) %>%
+  mutate(duration = scale(duration)) %>%
+  ggplot(aes(syl, duration)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+stress %>%
+  group_by(session) %>%
+  mutate(intensity_max = scale(intensity_max)) %>%
+  ggplot(aes(syl, intensity_max)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+
+stress %>%
+  group_by(session) %>%
+  mutate(f0_max = scale(f0_max)) %>%
+  ggplot(aes(syl, f0_max)) +
+  geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
+  geom_point(aes(colour = stress)) +
+  facet_grid(word ~ .) +
+  scale_color_manual(values = hoiho_7[c(4, 1)])
+```
+
+
 # Intonation
 
 ```{r f0-by-sentence, out.width="200%"}
