@@ -241,7 +241,8 @@ stress <- left_join(vow_stress, f0_stress %>% rename(f0 = `T1`)) %>%
     ),
     syl = factor(syl, levels = c("antepenultimate", "penultimate", "ultimate")),
     word = factor(word, levels = c("liri", "mulliri", "flutura"))
-  )
+  ) %>%
+  filter(f0_max > 0)
 ```
 
 And we save the tibble.
