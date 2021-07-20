@@ -20,6 +20,7 @@ update_geom_defaults("text", list(family = theme_get()$text$family))
 update_geom_defaults("label", list(family = theme_get()$text$family))
 hoiho_7 <- c(get_pal("Hoiho"), "#490B0A")
 options(ggplot2.discrete.fill = hoiho_7)
+library(patchwork)
 library(ggrepel)
 library(zoo)
 library(scales)
@@ -330,32 +331,60 @@ ggsave(here(acou_dir, "stress-f0-mean.png"), width = 7, height = 5)
 ```
 
 ```{r stress-scaled}
-stress %>%
+stress_filt <- stress %>%
+  filter(
+    session != "s05",
+    !(bundle %in% c("107-flutura", "102-mulliri", "008-mulliri", "099-flutura"))
+  )
+
+dur_p <- stress_filt %>%
   group_by(session) %>%
   mutate(duration = scale(duration)) %>%
   ggplot(aes(syl, duration)) +
   geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
-  geom_point(aes(colour = stress)) +
+  geom_point(aes(colour = stress), size = 2) +
   facet_grid(word ~ .) +
-  scale_color_manual(values = hoiho_7[c(4, 1)])
+  scale_color_manual(values = hoiho_7[c(4, 1)]) +
+  labs(
+    x = element_blank(),
+    y = "Vowel duration (z-scores)",
+    title = "Vowel duration"
+  ) +
+  theme(legend.position = "top")
 
-stress %>%
+int_p <- stress_filt %>%
   group_by(session) %>%
   mutate(intensity_max = scale(intensity_max)) %>%
   ggplot(aes(syl, intensity_max)) +
   geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
-  geom_point(aes(colour = stress)) +
+  geom_point(aes(colour = stress), size = 2) +
   facet_grid(word ~ .) +
-  scale_color_manual(values = hoiho_7[c(4, 1)])
+  scale_color_manual(values = hoiho_7[c(4, 1)]) +
+  labs(
+    x = element_blank(),
+    y = "Maximum intensity (z-scores)",
+    title = "Maximum intensity"
+  ) +
+  theme(legend.position = "none")
 
-stress %>%
+f0_p <- stress_filt %>%
   group_by(session) %>%
   mutate(f0_max = scale(f0_max)) %>%
   ggplot(aes(syl, f0_max)) +
   geom_line(aes(group = interaction(session, bundle)), colour = "grey") +
-  geom_point(aes(colour = stress)) +
+  geom_point(aes(colour = stress), size = 2) +
   facet_grid(word ~ .) +
-  scale_color_manual(values = hoiho_7[c(4, 1)])
+  scale_color_manual(values = hoiho_7[c(4, 1)]) +
+  labs(
+    x = "Syllable position",
+    y = "Maximum f0 (z-scores)",
+    title = "Maximum f0"
+  ) +
+  theme(legend.position = "none")
+
+dur_p + int_p + f0_p + plot_layout(ncol = 1)
+
+ggsave("img/acoustics/stress-dur-int-f0.png", width = 5, height = 10)
 ```
 
 
