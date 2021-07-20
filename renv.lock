@@ -766,6 +766,13 @@
       "Repository": "CRAN",
       "Hash": "446d64bb6df6b43f853e6e54eb740165"
     },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c446b30cb33ec125ff02588b60660ccb"
+    },
     "pillar": {
       "Package": "pillar",
       "Version": "1.6.1",
