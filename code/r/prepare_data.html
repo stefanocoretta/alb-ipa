@@ -1632,7 +1632,8 @@ ipa_list$cons &lt;- c(ipa_list$plos, ipa_list$fric, ipa_list$affr)</code></pre>
     ),
     syl = factor(syl, levels = c(&quot;antepenultimate&quot;, &quot;penultimate&quot;, &quot;ultimate&quot;)),
     word = factor(word, levels = c(&quot;liri&quot;, &quot;mulliri&quot;, &quot;flutura&quot;))
-  )</code></pre>
+  ) %&gt;%
+  filter(f0_max &gt; 0)</code></pre>
 <pre><code>## Joining, by = c(&quot;labels&quot;, &quot;start&quot;, &quot;end&quot;, &quot;db_uuid&quot;, &quot;session&quot;, &quot;bundle&quot;, &quot;start_item_id&quot;, &quot;end_item_id&quot;, &quot;level&quot;, &quot;attribute&quot;, &quot;start_item_seq_idx&quot;, &quot;end_item_seq_idx&quot;, &quot;type&quot;, &quot;sample_start&quot;, &quot;sample_end&quot;, &quot;sample_rate&quot;, &quot;word&quot;)</code></pre>
 <pre><code>## Joining, by = c(&quot;labels&quot;, &quot;start&quot;, &quot;end&quot;, &quot;db_uuid&quot;, &quot;session&quot;, &quot;bundle&quot;, &quot;start_item_id&quot;, &quot;end_item_id&quot;, &quot;level&quot;, &quot;attribute&quot;, &quot;start_item_seq_idx&quot;, &quot;end_item_seq_idx&quot;, &quot;type&quot;, &quot;sample_start&quot;, &quot;sample_end&quot;, &quot;sample_rate&quot;, &quot;word&quot;, &quot;sl_rowIdx&quot;, &quot;times_orig&quot;, &quot;times_rel&quot;, &quot;times_norm&quot;)</code></pre>
 <pre><code>## Joining, by = c(&quot;labels&quot;, &quot;session&quot;, &quot;bundle&quot;, &quot;start_item_id&quot;)
