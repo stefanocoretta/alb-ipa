@@ -545,6 +545,32 @@ moments %>%
 ggsave(here(acou_dir, "cog.svg"), width = 7, height = 5, device = svglite)
 ```
 
+```{r cog-lingual-plot}
+moments %>%
+  # add phantom voiceless glottal fricative
+  bind_rows(tibble(labels = NA, sl_rowIdx = NA, moment_1 = NA, moment_2 = NA,
+      moment_3 = NA, moment_4 = NA, consonant = NA, voicing = NA, poa = NA,
+      manner = NA, voicing_manner = "voiced fricatives"
+  )) %>%
+  mutate(voicing_manner = factor(voicing_manner, levels = c("voiceless fricatives", "voiceless affricates", "voiced fricatives", "voiced affricates"))) %>%
+  filter(!(poa %in% c("glottal", "labial", "dental", NA))) %>%
+  ggplot(aes(consonant, moment_1)) +
+  geom_jitter(
+    aes(colour = poa), alpha = 0.8,
+    position = position_jitter(width = 0.1, seed = 2534)
+  ) +
+  geom_violin(fill = NA) +
+  geom_boxplot(width = 0.1) +
+  facet_wrap(~ voicing_manner, scales = "free_x") +
+  labs(
+    x = element_blank(),
+    y = "Centre of gravity (Hz)"
+  ) +
+  theme(legend.position = "none")
+
+ggsave(here(acou_dir, "cog-lingual.svg"), width = 7, height = 5, device = svglite)
+```
+
 ```{r cog-means-sd}
 moments %>%
   group_by(consonant) %>%
