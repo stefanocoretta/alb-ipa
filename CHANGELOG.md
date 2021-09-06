@@ -1,4 +1,10 @@
-# v2
+# v2.0.9000
+
+## Added
+
+- Spectrograms of affricates and lingual affricates CoG plot.
+
+# v.20
 
 ## Added
 
