@@ -4,7 +4,9 @@
 
 - Spectrograms of affricates and lingual affricates CoG plot.
 
-# v.20
+- Recordings and plots examples of rhotics.
+
+# v2.0
 
 ## Added
 

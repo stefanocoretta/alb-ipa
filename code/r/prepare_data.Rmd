@@ -584,7 +584,7 @@ export_TextGridCollection(
   alb_ipa_db,
   examples_out,
   sessionPattern = "s04",
-  bundlePattern = "018-pata|036-kati|038-qava|002-gjaku|027-rrapi|035-peri|008-perde|057-cica|054-xixa|047-xhaja|063-5aji",
+  bundlePattern = "018-pata|036-kati|038-qava|002-gjaku|027-rrapi|035-peri|008-perde|057-cica|054-xixa|047-xhaja|063-5aji|070-rrapi|111-rrapi|016-puro|055-liri|102-mulliri",
   timeRefSegmentLevel = "MAU"
 )
 ```

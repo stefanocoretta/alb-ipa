@@ -27,6 +27,7 @@ library(scales)
 library(rticulate)
 library(mgcv)
 library(speakr)
+library(ggmosaic)
 ```
 
 # Utility functions
@@ -92,6 +93,15 @@ moments <- readRDS("./data/dataframes/spect_moments.rds")
 uti_laterals <- readRDS("./data/dataframes/uti-laterals.rds")
 uti_vowels <- readRDS("./data/dataframes/uti-vowels.rds")
 uti_palate <- readRDS("./data/dataframes/uti-palate.rds")
+
+# Rhotics
+rhos <- read_csv("data/varia/rhotics-impression.csv") %>%
+  pivot_longer(s01_1:s06_3) %>%
+  drop_na(value) %>%
+  mutate(
+    word_pos = factor(word_pos, levels = c("initial", "medial", "final"))
+  ) %>%
+  filter(value != "trill")
 ```
 
 # Formants
@@ -663,6 +673,24 @@ v_gams_preds %>%
   theme(legend.position = "none")
 
 ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
+```
+
+# Rhotics
+
+```{r}
+rhos %>%
+  ggplot() +
+  geom_mosaic(
+    aes(product(word_pos), fill = value),
+  ) +
+  theme_mosaic() +
+  labs(
+    x = "Position in the word",
+    y = "",
+    fill = "Allophone"
+  )
+
+ggsave("img/acoustics/rho.png", width = 7, height = 5)
 ```
 
 
