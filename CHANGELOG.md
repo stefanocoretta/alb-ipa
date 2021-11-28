@@ -18,6 +18,8 @@
 
 - Fix segmentation of /kati/ in S04.
 
+- Fixed wrong colours in vowels gam plot.
+
 
 
 # 2021-06-18

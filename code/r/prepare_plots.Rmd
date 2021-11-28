@@ -666,6 +666,7 @@ v_gams_preds %>%
     label.padding = unit(0.3, "lines"),
     min.segment.length = 15
   ) +
+  scale_color_manual(values = hoiho_7) +
   labs(
     x = "Back to front (mm)", y = "Low to high (mm)",
     caption = "Polar GAM smoothing, k = 8"
