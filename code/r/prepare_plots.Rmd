@@ -141,12 +141,14 @@ ggsave(here(acou_dir, "vowels-z.png"), width = 7, height = 5)
 centroids <- aggregate(cbind(F2.z.hz,F1.z.hz)~vowel, formants, mean)
 
 formants %>%
+  mutate(vowel = factor(vowel, levels = c("i", "e", "y", "ɜ", "a", "ɔ", "u"))) %>%
   ggplot(aes(x = F2.z.hz, y = F1.z.hz, group = vowel)) +
   scale_x_reverse(name = "F2 (norm Hz)", position = "top") +
   scale_y_reverse(name = "F1 (norm Hz)", position = "right") +
   geom_point(aes(colour = vowel), alpha = 0.5) +
   stat_ellipse(aes(colour = vowel), type = "norm", size = 1) +
   geom_text(data = centroids, aes(V1, V2, label = vowel), size = 7) +
+  scale_color_manual(values = hoiho_7) +
   theme(legend.position = "none") 
   # annotate("polygon", x = c(1000, 400, 400, 1000), y = c(1000, 400, 1000, 1000), alpha = 0.5)
 
@@ -518,6 +520,20 @@ average_dft %>%
   labs(x = "kHz", y = "dB")
 ```
 
+```{r spectra-vless}
+average_dft %>%
+  filter(consonant %in% c("f", "θ", "s", "ʃ", "h")) %>%
+  ggplot(aes(x = freq/1000, y = track_value, colour = consonant)) +
+  geom_line(alpha = 0.4) +
+  geom_smooth(method = "gam") +
+  scale_color_manual(values = hoiho_7) +
+  facet_wrap(~ consonant, nrow = 2) +
+  labs(x = "kHz", y = "dB") +
+  theme(legend.position = "none")
+
+ggsave(here(acou_dir, "spectra-vless.png"), width = 7, height = 5)
+```
+
 ```{r spectra-postalv}
 dft_l %>%
   filter(freq < 8000, consonant %in% c("ʃ", "tʃ", "t\u33B\u283\u33B", "ʒ", "dʒ", "d\u33B\u292\u33B")) %>%
@@ -644,12 +660,19 @@ vowels_gam <- polar_gam(
 ```
 
 ```{r vowels-gam-plot}
-v_gams_preds <- predict_polar_gam(vowels_gam, length_out = 100)
+v_gams_preds <- predict_polar_gam(vowels_gam, length_out = 100) %>%
+  mutate(
+    prompt = str_replace_all(prompt, c("E" = "ɜ", "o" = "ɔ")),
+    prompt = factor(prompt, levels = c("i", "e", "y", "ɜ", "a", "ɔ", "u"))
+  )
 
 v_highest <- v_gams_preds %>%
   group_by(prompt) %>%
   filter(Y == max(Y)) %>%
-  mutate(prompt = str_replace_all(prompt, c("E" = "ɜ", "o" = "ɔ")))
+  mutate(
+    prompt = str_replace_all(prompt, c("E" = "ɜ", "o" = "ɔ")),
+    prompt = factor(prompt, levels = c("i", "e", "y", "ɜ", "a", "ɔ", "u"))
+  )
 
 v_gams_preds %>%
   ggplot(aes(X, Y, colour = prompt)) +
@@ -658,9 +681,8 @@ v_gams_preds %>%
   geom_point(size = 0.01, colour = "white") +
   geom_label_repel(
     data = v_highest,
-    aes(label = prompt),
-    fill = hoiho_7,
-    colour = c("white", "white", "black", "white", "white", "white", "white"),
+    aes(label = prompt, fill = prompt),
+    colour = c("white", "white", "white", "black", "white", "white", "black"),
     size = 6,
     label.r = unit(0.3, "lines"),
     label.padding = unit(0.3, "lines"),

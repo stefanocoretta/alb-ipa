@@ -6,6 +6,12 @@
 
 - Recordings and plots examples of rhotics.
 
+- Power spectrum slices of voiceless fricatives.
+
+## Fixes
+
+- Colours of vowels in plots didn't match.
+
 # v2.0
 
 ## Added

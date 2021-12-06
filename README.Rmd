@@ -1,5 +1,5 @@
 ---
-title: "IPA illustration of Northern Tosk Albanian [tosk1239]"
+title: "IPA illustration of Northern Tosk Albanian"
 output: github_document
 ---
 
