@@ -8,7 +8,11 @@
 
 - Power spectrum slices of voiceless fricatives.
 
-## Fixes
+## Changed
+
+- Left boundary of word-initial voiceless stops/affricates moved to release.
+
+## Fixed
 
 - Colours of vowels in plots didn't match.
 
