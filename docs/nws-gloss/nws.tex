@@ -1,0 +1,392 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{fontspec}
+    \setmainfont{Charis SIL}
+    \newcommand{\tSl}{t̻ʃ̻}
+    \newcommand{\dZl}{d̻ʒ̻}
+    \newcommand{\gipa}{ɡ}
+    \newcommand{\grm}[1]{\char"2329#1\char"232A }
+
+\usepackage{expex}
+    \defineglwlevels{pm,ph,gloss}
+\usepackage{leipzig}
+    \makeglossaries
+
+\newleipzig{fir}{1}{first person}
+\newleipzig{sec}{2}{second person}
+\newleipzig{thi}{3}{third person}
+\newleipzig{dua}{12}{first person dual inclusive}
+\newleipzig{agent}{A}{transitive agent}
+\newleipzig{abess}{abess}{abessive}
+\renewleipzig{abl}{abl}{ablative}
+\renewleipzig{abs}{abs}{absolutive case}
+\newleipzig{absl}{absl}{absolute form}
+\newleipzig{abst}{abst}{abstract (nominalization)}
+\renewleipzig{acc}{acc}{accusative}
+\newleipzig{accid}{accid}{accidental (action)}
+\newleipzig{acces}{acces}{accessory (case)}
+\newleipzig{act}{act}{active}
+\newleipzig{actr}{actr}{actor}
+\newleipzig{adess}{adess}{adessive}
+\newleipzig{adjr}{adjr}{adjectivalizer}
+\newleipzig{adm}{adm}{admonitive}
+\newleipzig{advrs}{advrs}{adversative}
+\newleipzig{advr}{advr}{adverbializer}
+\newleipzig{aff}{aff}{affirmative}
+\newleipzig{affct}{affct}{affective}
+\newleipzig{agv}{ag}{agent(ive)}
+\newleipzig{alien}{al}{alienable}
+\renewleipzig{all}{all}{allative}
+\newleipzig{alloc}{alloc}{allocutive}
+\newleipzig{anim}{an}{animate}
+\newleipzig{ana}{ana}{anaphoric}
+\newleipzig{ant}{ant}{anterior}
+\newleipzig{anti}{anti}{antipassive}
+\newleipzig{aor}{aor}{aorist}
+\renewleipzig{appl}{appl}{applicative}
+\renewleipzig{art}{art}{article}
+\newleipzig{asp}{asp}{aspect}
+\newleipzig{ass}{ass}{assertive}
+\newleipzig{assoc}{assoc}{associative}
+\newleipzig{attr}{at}{attributor}
+\newleipzig{aug}{aug}{augmentative}
+\renewleipzig{aux}{aux}{auxiliary}
+\newleipzig{avers}{avers}{aversive}
+\renewleipzig{ben}{ben}{benefactive}
+\newleipzig{buff}{buff}{phonological buffer element}
+\newleipzig{card}{card}{cardinal (numeral)}
+\renewleipzig{caus}{caus}{causative}
+\newleipzig{circ}{circ}{circumstantial}
+\renewleipzig{clf}{clf}{classifier}
+\newleipzig{cln}{cln}{noun class n}
+\newleipzig{cmpl}{cmpl}{completive}
+\newleipzig{cmpr}{cmpr}{comparative}
+\newleipzig{cjprt}{cjprt}{conjunctive participle}
+\newleipzig{conj}{conj}{conjunction}
+\newleipzig{coord}{co}{coordinator}
+\newleipzig{coll}{coll}{collective}
+\renewleipzig{com}{com}{comitative}
+\renewleipzig{comp}{comp}{complementizer}
+\newleipzig{conc}{conc}{concessive}
+\renewleipzig{cond}{cond}{conditional}
+\newleipzig{conn}{conn}{connective}
+\newleipzig{const}{const}{construct form}
+\newleipzig{cont}{cont}{continuous}
+\newleipzig{contr}{contr}{contrastive}
+\renewleipzig{cop}{cop}{copula}
+\newleipzig{corr}{corr}{correlative}
+\newleipzig{cust}{cust}{customary}
+\newleipzig{dfir}{d1}{deictic of 1 person}
+\newleipzig{dsec}{d2}{deictic of 2 person}
+\newleipzig{dthi}{d3}{deictic of 3 person}
+\newleipzig{ddua}{d12}{deictic of 12 person}
+\renewleipzig{dat}{dat}{dative}
+\renewleipzig{decl}{decl}{declarative}
+\renewleipzig{def}{def}{definite}
+\newleipzig{defr}{defr}{deferential}
+\renewleipzig{dem}{dem}{demonstrative}
+\newleipzig{dep}{dep}{dependent verb form}
+\newleipzig{der}{der}{derivational morpheme}
+\newleipzig{des}{des}{desiderative}
+\renewleipzig{det}{det}{determiner}
+\newleipzig{detr}{detr}{detransitivizer}
+\newleipzig{dim}{dim}{diminutive}
+\newleipzig{dir}{dir}{directional}
+\renewleipzig{dist}{dist}{distal}
+\newleipzig{ditr}{ditr}{ditransitive}
+\newleipzig{dobj}{do}{direct object}
+\newleipzig{diffs}{ds}{different subject}
+\newleipzig{dstr}{dstr}{distributive}
+\renewleipzig{dua}{du}{dual}
+\newleipzig{dub}{dub}{dubitative}
+\renewleipzig{dur}{dur}{durative}
+\newleipzig{dwnt}{dwnt}{downtoner}
+\newleipzig{dyn}{dyn}{dynamic}
+\newleipzig{elat}{el}{elative}
+\newleipzig{emph}{emph}{emphatic}
+\newleipzig{eqt}{eqt}{equative}
+\renewleipzig{erg}{erg}{ergative}
+\newleipzig{ess}{ess}{essive}
+\newleipzig{evid}{evid}{evidential}
+\newleipzig{exc}{ex}{exclusive}
+\renewleipzig{excl}{excl}{exclamation}
+\newleipzig{exst}{exst}{exist(ence)}
+\newleipzig{fem}{f}{feminine}
+\newleipzig{fact}{fact}{factitive}
+\newleipzig{fam}{fam}{familiar}
+\newleipzig{fin}{fin}{finite}
+\newleipzig{fnl}{fnl}{final position marker}
+\renewleipzig{foc}{foc}{focus}
+\newleipzig{freq}{freq}{frequentative}
+\newleipzig{frm}{frm}{formal}
+\renewleipzig{fut}{fut}{future}
+\newleipzig{goal}{g}{ditransitive ``goal''}
+\renewleipzig{gen}{gen}{genitive}
+\newleipzig{ger}{ger}{gerund}
+\newleipzig{gnr}{gnr}{generic}
+\newleipzig{hab}{hab}{habitual}
+\newleipzig{hest}{hest}{hesternal}
+\newleipzig{hod}{hod}{hodiernal}
+\newleipzig{hon}{hon}{honorific}
+\newleipzig{hort}{hort}{hortative}
+\newleipzig{hum}{hum}{human}
+\newleipzig{hyp}{hyp}{hypothetical}
+\newleipzig{ill}{ill}{illative}
+\newleipzig{imm}{imm}{immediate}
+\renewleipzig{imp}{imp}{imperative}
+\newleipzig{impf}{impf}{imperfect(ive)}
+\newleipzig{impr}{impr}{impersonal}
+\newleipzig{in}{in}{inclusive}
+\newleipzig{inal}{inal}{inalienable}
+\newleipzig{inan}{inan}{inanimate}
+\newleipzig{inch}{inch}{inchoative}
+\newleipzig{incp}{incp}{inceptive}
+\renewleipzig{ind}{ind}{indicative}
+\renewleipzig{indf}{indf}{indefinite}
+\newleipzig{iness}{iness}{inessive}
+\renewleipzig{inf}{inf}{infinitive}
+\newleipzig{infr}{infr}{inferential evidential}
+\newleipzig{ingr}{ingr}{ingressive}
+\newleipzig{inj}{inj}{injunctive}
+\newleipzig{inst}{inst}{instrumental}
+\newleipzig{int}{int}{interrogative}
+\renewleipzig{intr}{intr}{intransitive}
+\newleipzig{ints}{ints}{intensifier/intensive}
+\newleipzig{inv}{inv}{inverse}
+\newleipzig{invs}{invs}{invisible}
+\newleipzig{io}{IO}{indirect object}
+\renewleipzig{irr}{irr}{irrealis}
+\newleipzig{iter}{iter}{iterative}
+\newleipzig{juss}{juss}{jussive}
+\newleipzig{lig}{lig}{ligature}
+\newleipzig{lnk}{lnk}{linker}
+\renewleipzig{loc}{loc}{locative}
+\newleipzig{log}{log}{logophoric}
+\newleipzig{masc}{m}{masculine}
+\newleipzig{mal}{mal}{malefactive}
+\newleipzig{man}{man}{manner}
+\newleipzig{mdl}{mdl}{modal}
+\newleipzig{med}{med}{medial}
+\newleipzig{medp}{medp}{mediopassive}
+\newleipzig{medt}{medt}{mediate}
+\newleipzig{mid}{mid}{middle}
+\newleipzig{mod}{mod}{modifier}
+\newleipzig{neut}{n}{neuter}
+\newleipzig{narr}{narr}{narrative}
+\newleipzig{ncmp}{ncmp}{noncompletive}
+\newleipzig{near}{near}{near}
+\newleipzig{nec}{nec}{necessity}
+\renewleipzig{neg}{neg}{negative}
+\newleipzig{nfnl}{nfnl}{nonfinal position marker}
+\newleipzig{nfoc}{nfoc}{nonfocus}
+\newleipzig{nfut}{nfut}{nonfuture}
+\newleipzig{nhum}{nhum}{nonhuman}
+\renewleipzig{nom}{nom}{nominative}
+\newleipzig{npst}{npst}{nonpast}
+\newleipzig{nomz}{nr}{nominalizer}
+\newleipzig{nsg}{nsg}{nonsingular}
+\newleipzig{nspec}{nspec}{nonspecific}
+\newleipzig{ntop}{ntop}{nontopic}
+\newleipzig{nvol}{nvol}{nonvolitional}
+\renewleipzig{obj}{obj}{object}
+\renewleipzig{obl}{obl}{oblique}
+\newleipzig{oblg}{oblg}{obligative}
+\newleipzig{obv}{obv}{obviative}
+\newleipzig{opt}{opt}{optative}
+\newleipzig{ord}{ord}{ordinal}
+\newleipzig{pat}{P}{transitive patient}
+\newleipzig{part}{part}{participle}
+\renewleipzig{pass}{pass}{passive}
+\newleipzig{pau}{pau}{paucal}
+\newleipzig{pclf}{pclf}{possessive classifier}
+\newleipzig{pej}{pej}{pejorative}
+\newleipzig{pfct}{pfct}{perfect}
+\renewleipzig{pl}{pl}{plural}
+\newleipzig{plt}{plt}{pluritive}
+\newleipzig{plup}{plup}{pluperfect}
+\newleipzig{pnct}{pnct}{punctual}
+\newleipzig{po}{po}{primary object}
+\newleipzig{pol}{pol}{polite}
+\renewleipzig{poss}{poss}{possessive}
+\newleipzig{post}{post}{postposition}
+\newleipzig{pot}{pot}{potential}
+\renewleipzig{pred}{pred}{predicative}
+\newleipzig{prep}{prep}{preposition}
+\newleipzig{prev}{prev}{preverb}
+\renewleipzig{prf}{prf}{perfective}
+\newleipzig{prn}{prn}{pronoun}
+\renewleipzig{prog}{prog}{progressive}
+\renewleipzig{proh}{proh}{prohibitive}
+\newleipzig{prol}{prol}{prolative}
+\renewleipzig{prox}{prox}{proximal}
+\renewleipzig{prs}{prs}{present}
+\newleipzig{prt}{prt}{preterite}
+\newleipzig{prtt}{prtt}{partitive}
+\newleipzig{prvt}{prvt}{privative}
+\newleipzig{prxt}{prxt}{proximate}
+\renewleipzig{pst}{pst}{past}
+\newleipzig{ptcl}{ptcl}{particle}
+\renewleipzig{purp}{purp}{purpose}
+\newleipzig{quad}{quad}{quadral}
+\renewleipzig{quot}{quot}{quotative}
+\newleipzig{rdp}{rdp}{reduplication}
+\newleipzig{rec}{rec}{recent}
+\renewleipzig{recp}{recp}{reciprocal}
+\newleipzig{ref}{ref}{referential}
+\renewleipzig{refl}{refl}{reflexive}
+\newleipzig{refr}{refr}{referential}
+\renewleipzig{rel}{rel}{relative clause marker}
+\newleipzig{rprn}{rprn}{relative pronoun}
+\newleipzig{rem}{rem}{remote (temporal)}
+\newleipzig{remt}{remt}{remote (spatial)}
+\newleipzig{rep}{rep}{reportive evidential}
+\renewleipzig{res}{res}{resultative}
+\newleipzig{real}{rl}{realis}
+\newleipzig{rlt}{rlt}{relative}
+\newleipzig{isubj}{S}{intransitive subject}
+\renewleipzig{sbj}{sbj}{subject}
+\newleipzig{sens}{sens}{sensory evidential}
+\newleipzig{seq}{seq}{sequential}
+\renewleipzig{sg}{sg}{singular}
+\newleipzig{sgt}{sgt}{singulative}
+\newleipzig{sim}{sim}{simultaneous}
+\newleipzig{smlf}{smlf}{semelfactive}
+\newleipzig{sobj}{so}{secondary object}
+\newleipzig{spec}{spec}{specific}
+\newleipzig{ss}{SS}{same subject}
+\newleipzig{stat}{stat}{stative}
+\renewleipzig{subj}{subj}{subjunctive}
+\newleipzig{subr}{subr}{subordinator}
+\newleipzig{sup}{sup}{superlative}
+\newleipzig{t}{T}{ditransitive ``theme''}
+\newleipzig{temp}{temp}{temporal}
+\newleipzig{term}{term}{terminative}
+\newleipzig{tns}{tns}{tense}
+\renewleipzig{top}{top}{topic}
+\renewleipzig{tr}{tr}{transitive}
+\newleipzig{trnsf}{trnsf}{transformative}
+\newleipzig{trnsl}{trnsl}{translative}
+\newleipzig{trl}{trl}{trial}
+\newleipzig{trns}{trns}{transitivizer}
+\newleipzig{undr}{undr}{undergoer}
+\newleipzig{unsp}{unsp}{unspecified}
+\newleipzig{val}{val}{validator}
+\newleipzig{vers}{vers}{version}
+\newleipzig{vis}{vis}{visible}
+\newleipzig{visl}{visl}{visual evidential}
+\newleipzig{vn}{vn}{verbal noun}
+\renewleipzig{voc}{voc}{vocative}
+\newleipzig{vol}{vol}{volitional}
+\newleipzig{vrz}{vr}{verbalizer}
+
+\newleipzig{abil}{abil}{abilitative}
+\newleipzig{iobj}{iobj}{indirect object}
+\newleipzig{ncaus}{ncaus}{non-consensual causative}
+\newleipzig{sapl}{sapl}{subjective applicative}
+\newleipzig{supe}{supe}{superessive}
+
+\newcommand{\Fss}{\Fir\Sg.\Subj}
+\newcommand{\Fso}{\Fir\Sg.\Obj}
+\newcommand{\Fsi}{\Fir\Sg.\Iobj}
+\newcommand{\Sss}{\Sec\Sg.\Subj}
+\newcommand{\Sso}{\Sec\Sg.\Obj}
+\newcommand{\Ssi}{\Sec\Sg.\Iobj}
+\newcommand{\Tss}{\Thi\Sg.\Subj}
+\newcommand{\Tso}{\Thi\Sg.\Obj}
+\newcommand{\Tsi}{\Thi\Sg.\Iobj}
+\newcommand{\Fps}{\Fir\Pl.\Subj}
+\newcommand{\Fpo}{\Fir\Pl.\Obj}
+\newcommand{\Fpi}{\Fir\Pl.\Iobj}
+\newcommand{\Sps}{\Sec\Pl.\Subj}
+\newcommand{\Spo}{\Sec\Pl.\Obj}
+\newcommand{\Spi}{\Sec\Pl.\Iobj}
+\newcommand{\Tps}{\Thi\Pl.\Subj}
+\newcommand{\Tpo}{\Thi\Pl.\Obj}
+\newcommand{\Tpi}{\Thi\Pl.\Iobj}
+
+
+\begin{document}
+
+\ex
+\begingl
+\gla er-a e ver-iut {} dhe diell-i {} po zihe-shin se kush ishte më i fortë {}//
+\glgloss wind-{\Nom.\Sg.\Def} of north-{\Gen.\Sg.\Def} {} and sun-{\Nom.\Sg.\Def} {} be.{\Pst.\Tpl} fight-{\Pst.\Tpl} \Comp{} \Prn{} be.{\Pst.\Tsg} \Cmpr{} {} strong//
+\glpm eɽa e veɽiut | ðe dielˠi | pɔ ziheʃin se kuʃ iʃte mɜ i fɔɽtɜ ‖//
+\glph ˈeɹä e veˈɽiut | θe diˈelˠi | po ˈzieʃin se kuʃ ˈiste mɜj {} ˈfɔɹt ‖//
+\glft  `The North Wind and the Sun were disputing which was the stronger,'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla kur aty kalo-i një udhëtar që kishte veshur një pallt-o të ngroht-ë.//
+\glgloss when there pass-{\Pst.\Tsg} {\Indf} traveller {\Rprn} have.{\Pst} wear.{\Ptcp} {\Indf} coat-{\Nom.\Sg.\Def} {\Inf} warm-{\Nom.\Sg.\Def}//
+\glpm kuɽ aty kalɔi ɲɜ uðɜtaɽ t̻ʃ̻ɜ kiʃte veʃuɽ ɲɜ palˠtɔ tɜ n\gipa{}ɽɔhtɛ ‖//
+\glph kuɹ ätʏ̈ käˈloi ɲuðɜˈtäɹ {} t̻ʃ̻ɜ ˈkiʃte ˈveʃu ɲɜ ˈpäl̞ˠto tɜ ˈŋ\gipa{}ɹäu̯t ‖//
+\glft  `when a traveller came along wrapped in a warm cloak.'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla ata ra-në dakord {} që kush do t-a bënte udhëtar-in të hiqte pallto-n më përpara do të quhej më i forti.//
+\glgloss \Tpl{} fall-{\Pst.\Tpl} agreement {} \Comp{} \Prn{} \Fut{} \Fut{}-?.\Tsg{} make.\Pst{} traveller-{\Nom.\Sg.\Def} \Inf{} take.off.{\Sbjv.\Pst.\Tsg} coat-{\Acc.\Sg.\Def} \Cmpr{} soon \Fut{} be call.{\Ind.\Pst.\Tsg}//
+\glpm ata ɽanɜ dakɔɽd | t̻ʃ̻ɜ  kuʃ do ta bɜnte uðɜtaɽin tɜ hit̻ʃ̻te palˠtɔn mɜ pɜɽpaɽa do tɜ t̻ʃ̻uhej mɜ i fɔɽt-i ‖//
+\glph äˌtä ɹän täˈkoɹt | t̻ʃ̻ɜ ˈkuʒ dɔ täˈ bɜntoːθˈtäɽin tɜˈhiʃ̻te ˈpäl̞ˠton mɜ pɜɹˈpäɽ̞ä do tɜ ˈt̻ʃ̻uɦej ˈmɜ i ˌfɔɹti ‖//
+\glft  `They agreed that the one who first succeeded in making the traveller take his cloak off should be considered stronger than the other.'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla Fill pas kësaj, {} Era e Veriut filloi të frynte me gjithë fuqinë e saj,//
+\glpm filˠ pas kɜsaj ǀ eɽa e veɽiut filˠɔi tɜ fɽynte me d̻ʒ̻iθɜ fut̻ʃ̻inɜ e saj ‖//
+\glph ˈfilˠ päs kɜˈsäj | ˈeɹä e veˈɽiut fiˈl̞ˠoi tɜ ˈfɹʏ̈nte me ˈd̻ʒ̻iθ fuʃ̻in e ˈsäj ‖ //
+\glgloss immediately after {\Dem} {} wind-{\Nom.\Sg.\Def} of north-{\Gen.\Sg.\Def} begin-{\Pst.\Tsg} {\Inf} blow.{\Sbjv.\Pst.\Tsg} with all power-{\Acc.\Sg.\Def} {\Tsg.\F.\Poss}//
+\glft  `Then the North Wind blew as hard as he could,'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla por sa më shumë që frynte {} aq më shumë kapej udhëtari pas pallto-s {së tij}//
+\glgloss but how {\Cmpr} much {\Comp} blow-{\Pst.\Tsg.\Def} {} {\Comp} {\Cmpr} much hold.on.{\Impf.\Tsg} traveller-{\Nom.\Sg.\Def} after coat-{\Gen.\Sg.\Def} {\Tsg.\Poss}//
+\glpm pɔɽ sa mɜ ʃumɜ t̻ʃ̻ɜ fɽynte | at̻ʃ̻ mɜ ʃumɜ kapej uðɜtaɽi pas palˠtɔs {sɜ tij} |//
+\glph poɹ ˈsä mɜ ˈʃum t̻ʃ̻ɜ ˈfɹʏ̈ənte | äʃ̻ mu ˈʃuŋkäpeuθˈtäɽi {} {} päs ˈpäl̞ˠtosɜˈti {} |//
+\glft  `but the more he blew the more closely did the traveller fold his cloak around him,'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla derisa më në fund {} era {} e ver-iut {} {u dorëzua}.//
+\glgloss until {\Cmpr} in end {} wind-{\Nom.\Sg.\Def} {} of north-{\Gen.\Sg.\Def} {} give.up.{\Aor.\Tsg}//
+\glpm deɽisa mɜ nɜ fund | eɽa | e veɽiut | {u doɽɜzua} ǁ //
+\glph  deɹiˈsä mɜ nɜ ˈfunt | ˈeɹä | e ve˞ˈɽiut | {u d̥oɹˈz̥uä} ‖ //
+\glft  `and at last the North Wind gave up the attempt.'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla pastaj diell-i lësho-i rrez-et e tij {të ngrohta} {} dhe menjëherë udhëtar-i e hoqi pallt-on.//
+\glgloss then sun-{\Nom.\Sg.\Def} release-{\Pst.\Tsg.\Def} ray-{\Nom.\Pl.\Def} {\Inf} {\Tsg} warm.up-{\Acc.\Pl.\Def} {} and immediately traveller-{\Nom.\Sg.\Def} {\Tsg.?.\Acc} take.off.{\Pst} coat-{\Acc.\Sg.\Def}//
+\glpm  pastaj dielˠi lɜʃɔi rezet e tij {tɜ n\gipa{}ɽɔhta} ǀ ðe meɲɜheɽɜ uðɜtaɽi e hɔt̻ʃ̻i palˠtɔn ǁ//
+\glph  ˈpästɛj ˈdielˠi lɜˌʃojɜ ˈɽɛzet e ˈti {tɜ ˈŋ\gipa{}ɹäu̯tä} | ðɛ miɲɜˈɦɛɹoθˈtäɽ̞i {} ɜ ˌhɔt̻ʃ̻i ˈpäu̯tɔn ‖//
+\glft  `Then the Sun shone out warmly and immediately the traveller took off his cloak.'//
+\endgl
+\xe
+
+\ex
+\begingl
+\gla e kështu {} era e veriut {} u detyrua të pranonte që diell-i {} ishte më {i fortë} se ajo. {}//
+\glgloss and so {} wind.\Det{}.\Sg{} {\Gen} north {} ? force {\Subj} accept.{\Pst}.{\Tsg} {\Comp} sun-{\Det.\Sg} {} be.{\Pst.\Tsg} {\Cmpr} {strong \Comp{}} {\Tsg.\F}//
+\glpm e kɜʃtu | eɽa e veɽiut | u detyɽua tɜ pɽanɔnte t̻ʃ̻ɜ dielˠi | iʃte mɜ {i fɔɽtɜ} se ajɔ ǁ//
+\glph e kɜʃˈtʊ | ˈeɻä e veˈɽ̞iut | u dɜtʏ̈ˈɹuä tɜ pɻäˈnɔ̃nte t̻ʃɜ ˈdielˠi | ˈʔiʃtɛ mʷɨj ˈfɔltsɛ̆ {} ˈäjɔ̃ ‖//
+\glft  `And so the North Wind was obliged to confess that the Sun was the stronger of the two.'//
+\endgl
+\xe
+
+\printglosses
+
+\end{document}
