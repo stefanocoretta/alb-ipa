@@ -1,8 +1,8 @@
 IPA illustration of Northern Tosk Albanian
 ================
 
-![](https://img.shields.io/badge/version-v2.0.9000-green.svg)
-![](https://img.shields.io/badge/version-2021--12--07-blue.svg)
+![](https://img.shields.io/badge/version-v2.1-green.svg)
+![](https://img.shields.io/badge/version-2021--12--15-blue.svg)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/VRY3H-yellow.svg)](https://doi.org/10.17605/OSF.IO/VRY3H)
 
 This is the GitHub repository of the project *IPA illustration of
@@ -97,6 +97,7 @@ Data collection and processing are documented in `docs/procedure.md`.
     ## │       ├── qgj-example
     ## │       └── vot-example
     ## ├── docs
+    ## │   └── nws-gloss
     ## ├── img
     ## │   ├── acoustics
     ## │   ├── articulation
