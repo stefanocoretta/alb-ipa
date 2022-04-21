@@ -1,8 +1,8 @@
 IPA illustration of Northern Tosk Albanian
 ================
 
-![](https://img.shields.io/badge/version-v2.1-green.svg)
-![](https://img.shields.io/badge/version-2021--12--15-blue.svg)
+![](https://img.shields.io/badge/version-v2.2-green.svg)
+![](https://img.shields.io/badge/version-2022--04--21-blue.svg)
 [![](https://img.shields.io/badge/doi-10.17605/OSF.IO/VRY3H-yellow.svg)](https://doi.org/10.17605/OSF.IO/VRY3H)
 
 This is the GitHub repository of the project *IPA illustration of

@@ -1,3 +1,12 @@
+# v2.2
+
+## Fixed
+
+- Fixed figure 3, 4, 5, 10.
+
+
+
+
 # v2.1
 
 ## Added

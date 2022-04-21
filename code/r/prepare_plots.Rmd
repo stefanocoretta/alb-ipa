@@ -252,7 +252,7 @@ vot %>%
   scale_y_continuous(breaks = seq(-200, 200, by = 50)) +
   coord_flip() +
   labs(
-    y = "Voice Onset Time (ms)", x = element_blank(),
+    y = "Voice Onset Time (ms)", x = "Consonant",
     caption = "Time 0 corresponds to the plosive release."
   )
 
@@ -528,7 +528,7 @@ average_dft %>%
   geom_smooth(method = "gam") +
   scale_color_manual(values = hoiho_7) +
   facet_wrap(~ consonant, nrow = 2) +
-  labs(x = "kHz", y = "dB") +
+  labs(x = "Frequency (kHz)", y = "Amplitude (dB)") +
   theme(legend.position = "none")
 
 ggsave(here(acou_dir, "spectra-vless.png"), width = 7, height = 5)
@@ -563,7 +563,7 @@ moments %>%
   geom_boxplot(width = 0.1) +
   facet_wrap(~ voicing_manner, scales = "free_x") +
   labs(
-    x = element_blank(),
+    x = "Consonant",
     y = "Centre of gravity (Hz)"
   ) +
   theme(legend.position = "none")
@@ -609,7 +609,7 @@ moments %>%
 ## Laterals
 
 ```{r laterals, message=F}
-uti_laterals %>%
+lat <- uti_laterals %>%
   mutate(prompt = recode_factor(prompt, ala = "/l/", alla = "/lˠ/")) %>%
   transform_coord(use_XY = T) %>%
   group_by(prompt) %>%
@@ -623,16 +623,34 @@ uti_laterals %>%
     ) / 5,
     Y = Y_smooth
   ) %>%
-  transform_coord(to = "cartesian", origin = c(10.6042772344165, -49.4069295776227), use_XY = T) %>%
+  transform_coord(to = "cartesian", origin = c(10.6042772344165, -49.4069295776227), use_XY = T)
+
+l_highest <- lat %>%
+  group_by(prompt) %>%
+  filter(Y == max(Y)) %>%
+  mutate(prompt = str_remove_all(prompt, "/"))
+
+lat %>%
   ggplot(aes(X, Y)) +
-  geom_path(aes(colour = prompt), size = 1) +
-  geom_path(data = uti_palate %>% filter(fan_line < 23), linetype = "dashed") +
+  geom_path(aes(colour = prompt), size = 2.5) +
+  geom_path(data = uti_palate %>% filter(fan_line < 23), size = 1, colour = "gray") +
+  geom_point(size = 0.01, colour = "white") +
+  geom_label_repel(
+    data = l_highest,
+    aes(label = prompt, fill = prompt),
+    colour = c("black", "white"),
+    size = 6,
+    label.r = unit(0.3, "lines"),
+    label.padding = unit(0.3, "lines"),
+    min.segment.length = 15
+  ) +
+  scale_color_manual(values = hoiho_7[c(1, 6, 7)]) +
   labs(
     colour = "lateral",
-    x = "back-to-front (mm)", y = "low-to-high (mm)",
+    x = "Back to front (mm)", y = "Low to high (mm)",
     caption = "Rolling mean filter, order = 5"
   ) +
-  scale_color_manual(values = hoiho_7[c(1, 6, 7)])
+  theme(legend.position = "none")
 
 ggsave(here(arti_dir, "uti-laterals.png"), width = 7, height = 5)
 ```
