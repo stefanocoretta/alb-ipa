@@ -675,6 +675,13 @@ vowels_gam <- polar_gam(
   data = uti_vowels %>% mutate(prompt = as.factor(prompt)),
   fan_lines = c(15, 20)
 )
+
+vowels_gam <- polar_gam(
+  Y ~
+    s(X, prompt, bs = "fs", k = 8),
+  data = uti_vowels %>% mutate(prompt = as.factor(prompt)),
+  fan_lines = c(15, 20)
+)
 ```
 
 ```{r vowels-gam-plot}
@@ -694,23 +701,23 @@ v_highest <- v_gams_preds %>%
 
 v_gams_preds %>%
   ggplot(aes(X, Y, colour = prompt)) +
-  geom_path(size = 2.5) +
+  geom_path(linewidth = 2.5) +
   geom_path(data = uti_palate %>% filter(fan_line < 23), size = 1, colour = "grey") +
   geom_point(size = 0.01, colour = "white") +
-  geom_label_repel(
+  geom_label(
     data = v_highest,
     aes(label = prompt, fill = prompt),
     colour = c("white", "white", "white", "black", "white", "white", "black"),
     size = 6,
     label.r = unit(0.3, "lines"),
-    label.padding = unit(0.3, "lines"),
-    min.segment.length = 15
+    label.padding = unit(0.3, "lines")
   ) +
   scale_color_manual(values = hoiho_7) +
   labs(
     x = "Back to front (mm)", y = "Low to high (mm)",
     caption = "Polar GAM smoothing, k = 8"
   ) +
+  coord_fixed() +
   theme(legend.position = "none")
 
 ggsave(here(arti_dir, "uti-vowels-gam.png"), width = 7, height = 5)
